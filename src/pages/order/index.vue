@@ -8,7 +8,7 @@
 export default {
   data() {
     return {
-      title: '第二页',
+      
     }
   },
   onLoad() {},

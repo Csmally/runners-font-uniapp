@@ -6,7 +6,7 @@
 export default {
   data() {
     return {
-      title: '第三页',
+      
     }
   },
   onLoad() {},
