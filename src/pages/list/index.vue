@@ -1,6 +1,6 @@
 <template>
   <view>
-    <uni-nav-bar title="导航栏"></uni-nav-bar>
+    我是第一页
   </view>
 </template>
 
@@ -17,9 +17,5 @@ export default {
 </script>
 
 <style>
-.head {
-  background-color: red;
-  height: var(--status-bar-height);
-}
 
 </style>

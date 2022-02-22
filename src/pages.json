@@ -1,13 +1,22 @@
 {
     "pages": [
         {
-            "path": "pages/list/index"
+            "path": "pages/list/index",
+            "style": {
+                "navigationBarTitleText": "Runners"
+            }
         },
         {
-            "path": "pages/order/index"
+            "path": "pages/order/index",
+            "style": {
+                "navigationBarTitleText": "订单"
+            }
         },
         {
-            "path": "pages/self/index"
+            "path": "pages/self/index",
+            "style": {
+                "navigationBarTitleText": "我的"
+            }
         }
     ],
     "easycom": {
@@ -20,7 +29,7 @@
         "color": "#B3ACAC",
         "selectedColor": "#1A1818",
         "borderStyle": "white",
-        "backgroundColor": "#F8F8F8",
+        "backgroundColor": "#FFFFFF",
         "list": [
             {
                 "pagePath": "pages/list/index",
@@ -43,10 +52,9 @@
         ]
     },
     "globalStyle": {
-        "navigationStyle": "custom",
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "Runners",
-        "navigationBarBackgroundColor": "#F8F8F8",
+        "navigationBarBackgroundColor": "#FFFFFF",
         "backgroundColor": "#F8F8F8"
     }
 }

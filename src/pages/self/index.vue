@@ -1,9 +1,5 @@
 <template>
-  <view class="content">
-    <view class="text-area">
-      <text class="title">{{ title }}</text>
-    </view>
-  </view>
+  <view>我是第三页</view>
 </template>
 
 <script>
@@ -19,19 +15,5 @@ export default {
 </script>
 
 <style>
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
 
-.text-area {
-  display: flex;
-  justify-content: center;
-}
-
-.title {
-  font-size: 36rpx;
-}
 </style>
