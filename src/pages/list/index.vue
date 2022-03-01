@@ -1,6 +1,9 @@
 <template>
   <view>
     我是第一是页
+    <view>
+      环境：{{envStr}}
+    </view>
   </view>
 </template>
 
@@ -8,7 +11,7 @@
 export default {
   data() {
     return {
-      
+      envStr: import.meta.env.MODE
     };
   },
   onLoad() {},

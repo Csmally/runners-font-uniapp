@@ -45,6 +45,8 @@
     "@dcloudio/uni-mp-weixin": "^3.0.0-alpha-3031120220216001",
     "@dcloudio/uni-quickapp-webview": "^3.0.0-alpha-3031120220216001",
     "@dcloudio/uni-ui": "^1.4.12",
+    "axios": "^0.26.0",
+    "thorui-uni": "^1.7.2",
     "vue": "^3.2.30",
     "vue-i18n": "^9.1.9",
     "vuex": "^4.0.2"
