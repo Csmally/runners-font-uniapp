@@ -1,11 +1,12 @@
 import wxKeys from '/pswConfig/wxKeysConfig.js'
 
-const host = import.meta.env.VITE_HOST + '/getUeserInfoFromWx'
+const host =
+    import.meta.env.VITE_HOST + '/wx/getUeserInfoFromWx'
 export function getOpenid() {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
         uni.login({
             onlyAuthorize: true,
-            success: (res)=>{
+            success: (res) => {
                 let data = {
                     appid: wxKeys.appid,
                     secret: wxKeys.appsecret,
@@ -13,12 +14,12 @@ export function getOpenid() {
                 }
                 uni.request({
                     url: host,
-                    data:data,
+                    data: data,
                     method: 'POST',
-                    success: (res1)=>{
+                    success: (res1) => {
                         resolve(res1.data.data.openid)
                     },
-                    fail:(error)=>{
+                    fail: (error) => {
                         reject(error)
                     }
                 })
@@ -29,13 +30,13 @@ export function getOpenid() {
 }
 
 export function getUserInfo() {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
         uni.getUserInfo({
             lang: 'zh_CN',
-            success: (res)=>{
+            success: (res) => {
                 resolve(res)
             },
-            fail: (error)=>{
+            fail: (error) => {
                 reject(error)
             }
         })
@@ -46,15 +47,15 @@ export function test() {
     uni.getUserProfile({
         desc: '获取信息11',
         lang: 'zh-CN',
-        success: (res)=>{
-            console.log('9898res888',res)
-            // uni.login({
-            //     onlyAuthorize: true,
-            //     success: (res1)=>{
-            //         // encryptedData
-            //         console.log('9898res11',res1)
-            //     }
-            // })
+        success: (res) => {
+            console.log('9898res888', res)
+                // uni.login({
+                //     onlyAuthorize: true,
+                //     success: (res1)=>{
+                //         // encryptedData
+                //         console.log('9898res11',res1)
+                //     }
+                // })
         }
     })
 }

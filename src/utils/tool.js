@@ -1,8 +1,9 @@
-const host = import.meta.env.VITE_HOST
+const host =
+    import.meta.env.VITE_HOST
 export function uniRequest(url, method, data) {
     return new Promise((resolve, reject) => {
         uni.request({
-            url: host + '/' + url,
+            url: host + '/wx/' + url,
             method: method ? method : 'get',
             data,
             success: (res) => {
@@ -23,14 +24,14 @@ export function setUpMenuInfo() {
 
             // 获取右侧胶囊的信息 单位px
             const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
-            //bottom: 胶囊底部距离屏幕顶部的距离
-            //height: 胶囊高度
-            //left:   胶囊左侧距离屏幕左侧的距离
-            //right:  胶囊右侧距离屏幕左侧的距离
-            //top:    胶囊顶部距离屏幕顶部的距离
-            //width:  胶囊宽度
-            // console.log(menuButtonInfo.width, menuButtonInfo.height, menuButtonInfo.top)
-            // console.log('计算胶囊右侧距离屏幕右边距离', result.screenWidth - menuButtonInfo.right)
+                //bottom: 胶囊底部距离屏幕顶部的距离
+                //height: 胶囊高度
+                //left:   胶囊左侧距离屏幕左侧的距离
+                //right:  胶囊右侧距离屏幕左侧的距离
+                //top:    胶囊顶部距离屏幕顶部的距离
+                //width:  胶囊宽度
+                // console.log(menuButtonInfo.width, menuButtonInfo.height, menuButtonInfo.top)
+                // console.log('计算胶囊右侧距离屏幕右边距离', result.screenWidth - menuButtonInfo.right)
             let menuWidth = menuButtonInfo.width + 'px'
             let menuHeight = menuButtonInfo.height + 'px'
             let menuBorderRadius = menuButtonInfo.height / 2 + 'px'
@@ -39,13 +40,13 @@ export function setUpMenuInfo() {
             let contentTop = result.statusBarHeight + 44 + 'px'
 
             let menuInfo = {
-                statusBarHeight: statusBarHeight,//状态栏高度----用来给自定义导航条页面的顶部导航条设计padding-top使用：目的留出系统的状态栏区域
-                menuWidth: menuWidth,//右侧的胶囊宽度--用来给自定义导航条页面的左侧胶囊设置使用
-                menuHeight: menuHeight,//右侧的胶囊高度--用来给自定义导航条页面的左侧胶囊设置使用
-                menuBorderRadius: menuBorderRadius,//一半的圆角--用来给自定义导航条页面的左侧胶囊设置使用
-                menuRight: menuRight,//右侧的胶囊距离右侧屏幕距离--用来给自定义导航条页面的左侧胶囊设置使用
-                menuTop: menuTop,//右侧的胶囊顶部距离屏幕顶部的距离--用来给自定义导航条页面的左侧胶囊设置使用
-                contentTop: contentTop,//内容区距离页面最上方的高度--用来给自定义导航条页面的内容区定位距离使用
+                statusBarHeight: statusBarHeight, //状态栏高度----用来给自定义导航条页面的顶部导航条设计padding-top使用：目的留出系统的状态栏区域
+                menuWidth: menuWidth, //右侧的胶囊宽度--用来给自定义导航条页面的左侧胶囊设置使用
+                menuHeight: menuHeight, //右侧的胶囊高度--用来给自定义导航条页面的左侧胶囊设置使用
+                menuBorderRadius: menuBorderRadius, //一半的圆角--用来给自定义导航条页面的左侧胶囊设置使用
+                menuRight: menuRight, //右侧的胶囊距离右侧屏幕距离--用来给自定义导航条页面的左侧胶囊设置使用
+                menuTop: menuTop, //右侧的胶囊顶部距离屏幕顶部的距离--用来给自定义导航条页面的左侧胶囊设置使用
+                contentTop: contentTop, //内容区距离页面最上方的高度--用来给自定义导航条页面的内容区定位距离使用
             }
             uni.setStorageSync('menuInfo', menuInfo)
         },
@@ -53,4 +54,4 @@ export function setUpMenuInfo() {
             console.log(error)
         }
     })
-} 
+}
