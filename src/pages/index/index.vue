@@ -15,12 +15,15 @@
         </scroll-view>
       </fui-radiogroup>
       <tui-grid :unlined="true">
-        <tui-grid-item class="grid grid_nomore" :hover="false" :bottomLine="false" :border="false"
-          @click="confirm('nomore')">没有？</tui-grid-item>
+        <tui-grid-item class="grid grid_nomore" :hover="false" :bottomLine="false" :border="false" @click="confirm('nomore')">
+          没有？
+        </tui-grid-item>
         <tui-grid-item class="grid grid_no" :hover="false" :bottomLine="false" :border="false" @click="confirm('no')">
-          NO~</tui-grid-item>
-        <tui-grid-item class="grid grid_go" :hover="false" :bottomLine="false" :border="false"
-          @click="confirm('go',campus)">GO!</tui-grid-item>
+          NO~
+        </tui-grid-item>
+        <tui-grid-item class="grid grid_go" :hover="false" :bottomLine="false" :border="false" @click="confirm('go',campus)">
+          GO!
+        </tui-grid-item>
       </tui-grid>
     </tui-modal>
   </view>

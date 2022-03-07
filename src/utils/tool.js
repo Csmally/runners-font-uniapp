@@ -1,5 +1,4 @@
-const host =
-    import.meta.env.VITE_HOST
+const host = import.meta.env.VITE_HOST
 export function uniRequest(url, method, data) {
     return new Promise((resolve, reject) => {
         uni.request({
@@ -24,14 +23,14 @@ export function setUpMenuInfo() {
 
             // 获取右侧胶囊的信息 单位px
             const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
-                //bottom: 胶囊底部距离屏幕顶部的距离
-                //height: 胶囊高度
-                //left:   胶囊左侧距离屏幕左侧的距离
-                //right:  胶囊右侧距离屏幕左侧的距离
-                //top:    胶囊顶部距离屏幕顶部的距离
-                //width:  胶囊宽度
-                // console.log(menuButtonInfo.width, menuButtonInfo.height, menuButtonInfo.top)
-                // console.log('计算胶囊右侧距离屏幕右边距离', result.screenWidth - menuButtonInfo.right)
+            //bottom: 胶囊底部距离屏幕顶部的距离
+            //height: 胶囊高度
+            //left:   胶囊左侧距离屏幕左侧的距离
+            //right:  胶囊右侧距离屏幕左侧的距离
+            //top:    胶囊顶部距离屏幕顶部的距离
+            //width:  胶囊宽度
+            // console.log(menuButtonInfo.width, menuButtonInfo.height, menuButtonInfo.top)
+            // console.log('计算胶囊右侧距离屏幕右边距离', result.screenWidth - menuButtonInfo.right)
             let menuWidth = menuButtonInfo.width + 'px'
             let menuHeight = menuButtonInfo.height + 'px'
             let menuBorderRadius = menuButtonInfo.height / 2 + 'px'

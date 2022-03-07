@@ -1,9 +1,9 @@
 <template>
   <view>
     <view class="title">头部区域</view>
-    <vie class="content">
+    <view class="content">
       content内容区域
-    </vie>
+    </view>
   </view>
 </template>
 
