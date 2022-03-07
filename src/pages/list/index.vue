@@ -11,14 +11,17 @@
 export default {
   data() {
     return {
-      envStr: import.meta.env.MODE
+      envStr: import.meta.env.MODE,
     };
   },
-  onLoad() {},
+  onLoad() {
+    uni.showTabBarRedDot({
+      index: 1,
+    });
+  },
   methods: {},
 };
 </script>
 
 <style>
-
 </style>

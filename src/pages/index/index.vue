@@ -59,6 +59,17 @@ export default {
     console.log("9898谁先55");
   },
   async onShow() {
+    //新增学校测试
+    // uni.navigateTo({
+    //   url: "/pages/addCampus/index",
+    // });
+    uni.switchTab({
+        url: "/pages/list/index",
+      });
+    return
+
+
+
     this.loading = true;
     //获取是否新用户
     let openid = await getOpenid();
