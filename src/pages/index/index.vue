@@ -85,9 +85,15 @@ export default {
     async confirm(type, value) {
       if (type === "nomore") {
         console.log("9898此时需要跳转到新增学校页面");
+        uni.navigateTo({
+          url: "/pages/addCampus/index",
+        });
       }
       if (type === "no") {
         console.log("9898此时需要跳转到list页面，只是不带用户信息");
+        uni.switchTab({
+          url: "/pages/list/index",
+        });
       }
       if (type === "go") {
         if (value === null) {

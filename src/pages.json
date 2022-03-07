@@ -6,6 +6,12 @@
             }
         },
         {
+            "path": "pages/addCampus/index",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
             "path": "pages/list/index",
             "style": {
                 "navigationBarTitleText": "Runners"
