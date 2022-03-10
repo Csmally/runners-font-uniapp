@@ -11,6 +11,6 @@ export default {
 /*每个页面公共css */
 @import './fui.scss';
 page {
-  background-color: #f8f8f8;
+  background-color: #F8F8F8;
 }
 </style>
