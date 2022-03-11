@@ -18,8 +18,48 @@
 				<text :style="{fontSize:labelSize+'rpx',color:labelColor}">{{label}}</text>
 			</view>
 			<slot name="left"></slot>
-			<input class="fui-input__self" :class="{'fui-input__text-right':textRight}"
-				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" :type="type"
+			<input v-if="type==='text'" class="fui-input__self" :class="{'fui-input__text-right':textRight}"
+				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" type="text"
+				:name="name" :value="val" :password="password" :placeholder="placeholder"
+				:placeholder-style="placeholderStyl" :disabled="disabled" :cursor-spacing="cursorSpacing"
+				:maxlength="maxlength" :focus="focused" :confirm-type="confirmType" :confirm-hold="confirmHold"
+				:cursor="cursor" :selection-start="selectionStart" :selection-end="selectionEnd"
+				:adjust-position="adjustPosition" :hold-keyboard="holdKeyboard" :auto-blur="autoBlur"
+				:enableNative="false" @focus="onFocus" @blur="onBlur" @input="onInput" @confirm="onConfirm"
+				@keyboardheightchange="onKeyboardheightchange" />
+			
+			<input v-else-if="type==='number'" class="fui-input__self" :class="{'fui-input__text-right':textRight}"
+				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" type="number"
+				:name="name" :value="val" :password="password" :placeholder="placeholder"
+				:placeholder-style="placeholderStyl" :disabled="disabled" :cursor-spacing="cursorSpacing"
+				:maxlength="maxlength" :focus="focused" :confirm-type="confirmType" :confirm-hold="confirmHold"
+				:cursor="cursor" :selection-start="selectionStart" :selection-end="selectionEnd"
+				:adjust-position="adjustPosition" :hold-keyboard="holdKeyboard" :auto-blur="autoBlur"
+				:enableNative="false" @focus="onFocus" @blur="onBlur" @input="onInput" @confirm="onConfirm"
+				@keyboardheightchange="onKeyboardheightchange" />
+
+			<input v-else-if="type==='idcard'" class="fui-input__self" :class="{'fui-input__text-right':textRight}"
+				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" type="idcard"
+				:name="name" :value="val" :password="password" :placeholder="placeholder"
+				:placeholder-style="placeholderStyl" :disabled="disabled" :cursor-spacing="cursorSpacing"
+				:maxlength="maxlength" :focus="focused" :confirm-type="confirmType" :confirm-hold="confirmHold"
+				:cursor="cursor" :selection-start="selectionStart" :selection-end="selectionEnd"
+				:adjust-position="adjustPosition" :hold-keyboard="holdKeyboard" :auto-blur="autoBlur"
+				:enableNative="false" @focus="onFocus" @blur="onBlur" @input="onInput" @confirm="onConfirm"
+				@keyboardheightchange="onKeyboardheightchange" />
+
+			<input v-else-if="type==='digit'" class="fui-input__self" :class="{'fui-input__text-right':textRight}"
+				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" type="digit"
+				:name="name" :value="val" :password="password" :placeholder="placeholder"
+				:placeholder-style="placeholderStyl" :disabled="disabled" :cursor-spacing="cursorSpacing"
+				:maxlength="maxlength" :focus="focused" :confirm-type="confirmType" :confirm-hold="confirmHold"
+				:cursor="cursor" :selection-start="selectionStart" :selection-end="selectionEnd"
+				:adjust-position="adjustPosition" :hold-keyboard="holdKeyboard" :auto-blur="autoBlur"
+				:enableNative="false" @focus="onFocus" @blur="onBlur" @input="onInput" @confirm="onConfirm"
+				@keyboardheightchange="onKeyboardheightchange" />
+
+			<input v-else class="fui-input__self" :class="{'fui-input__text-right':textRight}"
+				:style="{fontSize:size+'rpx',color:color}" placeholder-class="fui-input__placeholder" type="text"
 				:name="name" :value="val" :password="password" :placeholder="placeholder"
 				:placeholder-style="placeholderStyl" :disabled="disabled" :cursor-spacing="cursorSpacing"
 				:maxlength="maxlength" :focus="focused" :confirm-type="confirmType" :confirm-hold="confirmHold"
