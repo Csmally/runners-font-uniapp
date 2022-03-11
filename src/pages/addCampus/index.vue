@@ -105,7 +105,7 @@ export default {
         },
         campus: {
           img: {
-            url: "/static/campus1.png",
+            url: "/static/campus.png",
             circle: true,
           },
           title: {
