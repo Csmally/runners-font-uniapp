@@ -12,26 +12,48 @@
   </fui-animation>
   <scroll-view class="myScroll" scroll-y @scroll="onScroll">
     <view :style="{height: navigationBarHeight}"></view>
-    <view v-show="isContentShow">
+    <view v-show="isContentShow" style="padding-bottom: 30rpx">
       <!-- 社区信息 -->
       <view class="card">
         <tui-card :image="card.campus.img" :title="card.campus.title">
           <template slot="body">
             <view class="tui-default">
-              <fui-input :value="form.campusName" label="名称" required textRight placeholder="请输入学校或社区名称" />
-              <fui-input :value="form.campusNature" label="性质" required textRight placeholder="请选择学校或社区性质" />
-              <fui-input :value="form.campusAddress" label="地址" required textRight placeholder="请选择学校或社区地址" />
-              <fui-input :value="form.campusName" label="年龄" required textRight placeholder="请输入学校或社区名称" />
+              <fui-input v-model="form.campusName" label="名称" required textRight placeholder="请输入学校或社区名称" />
+              <picker mode="selector" :value="natureIndex" :range="natures" @change="natureChange">
+                <fui-listcell :highlight="false">
+                  <view>
+                    <text class="fui-input__required" style="color:#FF2B2B">*</text>
+                    <text>性质</text>
+                  </view>
+                  <view>
+                    <text v-if="!isNatureSelect" class="fui-input__placeholder">请选择学校或社区性质</text>
+                    <text v-if="isNatureSelect" class="fui-input__placeholder" style="color:#000000">{{form.campusNature}}</text>
+                  </view>
+                </fui-listcell>
+              </picker>
+              <picker mode="region" @change="campusAddressChange">
+                <fui-listcell :highlight="false">
+                  <view>
+                    <text class="fui-input__required" style="color:#FF2B2B">*</text>
+                    <text>地址</text>
+                  </view>
+                  <view>
+                    <text v-if="!isCampusAddressSelect" class="fui-input__placeholder">请选择学校或社区地址</text>
+                    <text v-if="isCampusAddressSelect" class="fui-input__placeholder" style="color:#000000">{{form.campusAddress}}</text>
+                  </view>
+                </fui-listcell>
+              </picker>
+              <!-- <fui-input :value="form.campusAddress" label="地址" required textRight placeholder="请选择学校或社区地址" /> -->
             </view>
           </template>
         </tui-card>
       </view>
       <!-- 个人信息 -->
       <view class="card">
-        <tui-card :image="card.self.img" :title="card.self.title">
+        <tui-card :image="card.self.img" :title="card.self.title" :tag="card.self.tag">
           <template slot="body">
             <view class="tui-default">
-              <fui-input :value="form.name" label="姓名" required textRight placeholder="请输入姓名" />
+              <fui-input v-model="form.name" label="姓名" required textRight placeholder="请输入姓名" />
               <picker mode="selector" :value="sexIndex" :range="sexs" @change="sexChange">
                 <fui-listcell :highlight="false">
                   <view>
@@ -47,7 +69,7 @@
                   </view>
                 </fui-listcell>
               </picker>
-              <fui-input :value="form.age" label="年龄" type="number" required textRight placeholder="请输入年龄" />
+              <fui-input v-model="form.age" label="年龄" type="number" required textRight placeholder="请输入年龄" />
               <picker mode="selector" :value="gradeIndex" :range="grades" @change="gradeChange">
                 <fui-listcell :highlight="false">
                   <view>
@@ -59,9 +81,9 @@
                   </view>
                 </fui-listcell>
               </picker>
-              <fui-input :value="form.wxAccount" label="微信账号" textRight placeholder="请输入年龄" />
-              <fui-input :value="form.qqAccount" label="QQ账号" textRight placeholder="请输入年龄" />
-              <fui-input :value="form.email" label="邮箱" textRight placeholder="请输入年龄" />
+              <fui-input v-model="form.wxAccount" label="微信账号" textRight placeholder="请输入年龄" />
+              <fui-input v-model="form.qqAccount" label="QQ账号" textRight placeholder="请输入年龄" />
+              <fui-input v-model="form.email" label="邮箱" textRight placeholder="请输入年龄" />
             </view>
           </template>
         </tui-card>
@@ -71,11 +93,26 @@
         <tui-card :image="card.joinus.img" :title="card.joinus.title">
           <template slot="body">
             <view class="tui-default">
-              卡片内容部分
+              <picker mode="selector" :range="joinTypes" @change="joinTypeChange">
+                <fui-listcell :highlight="false">
+                  <view>
+                    <!-- <text class="fui-input__required" style="color:#FF2B2B">*</text> -->
+                    <text>是否愿意加入Runners</text>
+                  </view>
+                  <view>
+                    <text v-if="!isJoinSelect" class="fui-input__placeholder">请选择</text>
+                    <text v-if="isJoinSelect" class="fui-input__placeholder" style="color:#000000">{{form.isJoin}}</text>
+                  </view>
+                </fui-listcell>
+              </picker>
+
+              <fui-textarea v-model="form.desc" maxlength="250" placeholder="您想象中或者希望的Runners是什么样子的呢～" isCounter />
             </view>
           </template>
         </tui-card>
       </view>
+      <!-- 提交按钮 -->
+      <fui-button class="submitBtn" width="80%" background="#000000" color="#FFFFFF" :loading="btnLoading" @click="submit">确定</fui-button>
     </view>
   </scroll-view>
 </template>
@@ -102,8 +139,12 @@ export default {
   },
   data() {
     return {
+      btnLoading: false,
       isSexSelect: false,
       isGradeSelect: false,
+      isNatureSelect: false,
+      isCampusAddressSelect: false,
+      isJoinSelect: false,
       endTagUrl: null,
       endTagStyle: null,
       form: {
@@ -114,6 +155,11 @@ export default {
         wxAccount: null,
         qqAccount: null,
         email: null,
+        campusName: null,
+        campusNature: null,
+        campusAddress: null,
+        isJoin: null,
+        desc: ""
       },
       sexs: ["男", "女", "未知"],
       grades: [
@@ -129,8 +175,11 @@ export default {
         "研三",
         "其他",
       ],
+      natures: ["学校", "社区"],
+      joinTypes: ["是", "否"],
       sexIndex: 0,
       gradeIndex: 3,
+      natureIndex: 0,
       alertModalStatus: false,
       isContentShow: false,
       animations: ["zoom-in"],
@@ -145,6 +194,9 @@ export default {
             color: "#000000",
             size: 34,
           },
+          tag: {
+            text: "（仅用做后续提供奖励联系您）",
+          }
         },
         campus: {
           img: {
@@ -225,6 +277,21 @@ export default {
       this.isGradeSelect = true;
       this.form.grade = this.grades[e.detail.value];
     },
+    natureChange(e) {
+      this.isNatureSelect = true;
+      this.form.campusNature = this.natures[e.detail.value];
+    },
+    campusAddressChange(e) {
+      this.isCampusAddressSelect = true;
+      this.form.campusAddress = e.detail.value.join("-");
+    },
+    joinTypeChange(e) {
+      this.isJoinSelect = true;
+      this.form.isJoin = this.joinTypes[e.detail.value];
+    },
+    submit() {
+      console.log('9898提交form',this.form)
+    }
   },
 };
 </script>
@@ -283,6 +350,11 @@ export default {
 .columnFlex {
   display: flex;
   align-items: center;
+}
+.submitBtn {
+  display: flex;
+  justify-content: center;
+  margin: 50rpx 0;
 }
 </style>
 
