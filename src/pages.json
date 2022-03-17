@@ -7,7 +7,7 @@
             }
         },
         {
-            "path": "pages/addCampus/index",
+            "path": "pages/index/addCampus",
             "style": {
                 "navigationStyle": "custom"
             }
@@ -28,6 +28,12 @@
             "path": "pages/self/index",
             "style": {
                 "navigationBarTitleText": "我的"
+            }
+        },
+        {
+            "path": "pages/result/index",
+            "style": {
+                "navigationStyle": "custom"
             }
         }
     ],
