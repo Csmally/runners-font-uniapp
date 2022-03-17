@@ -316,6 +316,7 @@ export default {
         ...this.form,
         openid: this.openid,
       });
+      this.submitLoading = false;
       uni.navigateTo({
         url: "/pages/result/index",
       });
