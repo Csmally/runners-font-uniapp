@@ -1,7 +1,7 @@
 <template>
   <view class="resultCanvas">
     <canvas style="width:750rpx;height:520rpx" type="2d" id="myCanvas"></canvas>
-    <text class="resultStr">Success</text>
+    <text class="resultStr" :style="'color:'+titleColor">{{title}}</text>
   </view>
 </template>
 
@@ -21,7 +21,8 @@ export default {
   mounted() {
     console.log("555");
     uni
-      .createSelectorQuery().in(this)
+      .createSelectorQuery()
+      .in(this)
       .select("#myCanvas")
       .fields({
         node: true,
@@ -50,7 +51,7 @@ export default {
         this.yEnd = Math.round((170 * res[0].height) / 520);
         this.canvasWidth = res[0].width;
         this.canvasHeight = res[0].height;
-        ctx.strokeStyle = "#68E534";
+        ctx.strokeStyle = this.canvasColor;
         ctx.scale(dpr, dpr);
         // this.render(ctx);
         // return;
@@ -66,6 +67,20 @@ export default {
         };
         canvas.requestAnimationFrame(renderAnimation);
       });
+  },
+  props: {
+    title: {
+      type: String,
+      default: "Success",
+    },
+    titleColor: {
+      type: String,
+      default: "#333",
+    },
+    canvasColor: {
+      type: String,
+      default: "#68E534",
+    },
   },
   data() {
     return {
@@ -147,15 +162,6 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-.resultStr1 {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  font-size: 36rpx;
-  margin-top: 40rpx;
-  color: #333;
-  opacity: 1;
-  text-align: center;
 }
 
 .resultStr {

@@ -4,7 +4,7 @@ export function uniRequest(url, method, data) {
         uni.request({
             url: host + '/wx/' + url,
             method: method ? method : 'get',
-            data,
+            data: data ? data : {},
             success: (res) => {
                 resolve(res.data)
             },
@@ -14,6 +14,24 @@ export function uniRequest(url, method, data) {
         })
     })
 }
+
+export function jumpTo(url, param) {
+    if (param) {
+        let arr = []
+        for (const key in param) {
+            arr.push(key + "=" + param[key])
+        }
+        let newUrl = url + "?" + arr.join("&")
+        uni.navigateTo({
+            url: newUrl,
+        });
+    } else {
+        uni.navigateTo({
+            url
+        });
+    }
+}
+
 export function setUpMenuInfo() {
     uni.getSystemInfo({
         success: (result) => {

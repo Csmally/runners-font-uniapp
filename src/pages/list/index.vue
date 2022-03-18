@@ -15,9 +15,9 @@ export default {
     };
   },
   onLoad() {
-    uni.showTabBarRedDot({
-      index: 1,
-    });
+    // uni.showTabBarRedDot({
+    //   index: 1,
+    // });
   },
   methods: {},
 };

@@ -122,7 +122,7 @@
 <script>
 import navigationBar from "@/components/navigationBar.vue";
 import NavBar from "@/components/navBar.vue";
-import { uniRequest } from "@/utils/tool.js";
+import { uniRequest, jumpTo } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
   components: { navigationBar, NavBar },
@@ -317,9 +317,7 @@ export default {
         openid: this.openid,
       });
       this.submitLoading = false;
-      uni.navigateTo({
-        url: "/pages/result/index",
-      });
+      jumpTo("/pages/result/index",{title:"提交成功！"});
     },
   },
 };
