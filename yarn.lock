@@ -3787,6 +3787,11 @@ terser@^5.7.2:
     source-map "~0.7.2"
     source-map-support "~0.5.20"
 
+thorui-uni@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.npmmirror.com/thorui-uni/-/thorui-uni-1.7.2.tgz#c576137c03b17543af8510d6e95068635a440d05"
+  integrity sha512-lxILaLKVbLrmOQUxIcV0Q2JzmuA0+1cjGTp8hKRHzuXor7b21p62aC38yHr7BkTUXaWJERKGyVyF2MlgnaKRhg==
+
 to-fast-properties@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmmirror.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"

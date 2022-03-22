@@ -41,27 +41,14 @@ export default {
       loading: false,
       isModalShow: false,
       campus: null,
-      campuses: [],
-      campuss: [
-        { value: "qinghua", name: "清华大学" },
-        { value: "beida", name: "北京大学" },
-        { value: "nanda", name: "南京大学" },
-        { value: "fudan", name: "复旦大学" },
-        { value: "taili", name: "太原理工大学" },
-        { value: "shanda", name: "山西大学" },
-        { value: "keda", name: "太原科技大学" },
-        { value: "xijiaoda", name: "西安交通大学" },
-      ],
       openid: null,
     };
   },
   onLoad() {
-    console.log("9898");
+    
   },
   async onShow() {
     this.loading = true;
-    let campuses = await uniRequest("campus/search", "post");
-    this.campuses = campuses.data;
     //获取是否新用户
     let openid = await getOpenid();
     this.openid = openid;

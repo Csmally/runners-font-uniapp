@@ -9,8 +9,12 @@ export default {
 
 <style>
 /*每个页面公共css */
-@import './fui.scss';
+@import "./fui.scss";
 page {
-  background-color: #F8F8F8;
+}
+.hiddenText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
