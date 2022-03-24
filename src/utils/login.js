@@ -43,19 +43,17 @@ export function getUserInfo() {
     })
 }
 
-export function test() {
-    uni.getUserProfile({
-        desc: '获取信息11',
-        lang: 'zh-CN',
-        success: (res) => {
-            console.log('9898res888', res)
-                // uni.login({
-                //     onlyAuthorize: true,
-                //     success: (res1)=>{
-                //         // encryptedData
-                //         console.log('9898res11',res1)
-                //     }
-                // })
-        }
+export function getUserProfile() {
+    return new Promise((resolve, reject) => {
+        uni.getUserProfile({
+            desc: '获取信息11',
+            lang: 'zh-CN',
+            success: (res) => {
+                resolve(res)
+            },
+            fail: (error) => {
+                reject(error)
+            }
+        })
     })
 }

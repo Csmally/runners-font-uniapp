@@ -1,20 +1,7 @@
 <template>
-  <NavBar mark="back" />
-  <navigationBar :opacity="opacity" titleText="社区添加" />
-  <fui-backdrop :show="alertModalStatus" :zIndex="1" />
-  <fui-animation :duration="500" :animationType="animations" :show="alertModalStatus">
-    <view class="alertBox">
-      <image class="alertImg" :src="addCampusBase64.modalImg" mode="aspectFit" />
-      <view class="alertClose">
-        <tui-icon @click="closeAlert" name="close" color="#ffffff"></tui-icon>
-      </view>
-    </view>
-  </fui-animation>
-  <tui-toast ref="toast" position="center"></tui-toast>
-  <fui-loading v-if="submitLoading" text="提交中. . ." :srcCol="commonBase64.loading"></fui-loading>
   <scroll-view class="myScroll" scroll-y @scroll="onScroll" :style="`background-image:url(${addCampusBase64.backgroundImg})`">
     <view :style="{height: navigationBarHeight}"></view>
-    <view v-show="isContentShow" style="padding-bottom: 30rpx">
+    <view v-show="true" style="padding-bottom: 30rpx">
       <!-- 社区信息 -->
       <view class="card">
         <tui-card :image="card.campus.img" :title="card.campus.title">
@@ -127,9 +114,7 @@ import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
   components: { navigationBar, NavBar },
   onInit() {},
-  onLoad(option) {
-    this.openid = option.openid;
-  },
+  onLoad() {},
   onShow() {
     console.log("333");
     setTimeout(() => {
@@ -271,18 +256,16 @@ export default {
       if (e.detail.value === "0") {
         this.endTagStyle = "width:73rpx;height:43rpx";
         this.endTagUrl = addCampusBase64.manEndTag;
-        this.form.sex = "1";
       }
       if (e.detail.value === "1") {
         this.endTagStyle = "width:73rpx;height:43rpx";
         this.endTagUrl = addCampusBase64.womanEndTag;
-        this.form.sex = "2";
       }
       if (e.detail.value === "2") {
         this.endTagStyle = "width:43rpx;height:43rpx";
         this.endTagUrl = addCampusBase64.manOrWomanEndTag;
-        this.form.sex = "0";
       }
+      this.form.sex = this.sexs[e.detail.value];
     },
     gradeChange(e) {
       this.isGradeSelect = true;

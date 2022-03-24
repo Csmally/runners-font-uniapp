@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { getOpenid, getUserInfo } from "@/utils/login.js";
+import { getOpenid, getUserProfile } from "@/utils/login.js";
 import { uniRequest, jumpTo } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
@@ -44,9 +44,7 @@ export default {
       openid: null,
     };
   },
-  onLoad() {
-    
-  },
+  onLoad() {},
   async onShow() {
     this.loading = true;
     //获取是否新用户
@@ -78,9 +76,24 @@ export default {
       }
       if (type === "no") {
         console.log("9898此时需要跳转到list页面，只是不带用户信息");
-        uni.switchTab({
-          url: "/pages/list/index",
-        });
+        let proInfo = await getUserProfile();
+        if (proInfo) {
+          let info = {
+            avatarUrl: proInfo.userInfo.avatarUrl,
+            gender: proInfo.userInfo.gender,
+            nickName: proInfo.userInfo.nickName,
+            openid: this.openid,
+            campus: "",
+            type: "2",
+          };
+          uni.setStorageSync("userInfo", info);
+          await uniRequest("userInfo/add", "post", info);
+          uni.switchTab({
+            url: "/pages/list/index",
+          });
+        } else {
+          return;
+        }
       }
       if (type === "go") {
         if (value === null) {
@@ -92,15 +105,24 @@ export default {
           this.$refs.toast.show(options);
           console.log("9898此时告诉用户需要先选择学校");
         } else {
-          let info = {
-            openid: this.openid,
-            campus: value,
-          };
-          uni.setStorageSync("userInfo", info);
-          await uniRequest("userInfo/add", "post", info);
-          uni.switchTab({
-            url: "/pages/list/index",
-          });
+          let proInfo = await getUserProfile();
+          if (proInfo) {
+            let info = {
+              avatarUrl: proInfo.userInfo.avatarUrl,
+              gender: proInfo.userInfo.gender,
+              nickName: proInfo.userInfo.nickName,
+              openid: this.openid,
+              campus: value,
+              type: "1",
+            };
+            uni.setStorageSync("userInfo", info);
+            await uniRequest("userInfo/add", "post", info);
+            uni.switchTab({
+              url: "/pages/list/index",
+            });
+          } else {
+            return;
+          }
         }
       }
     },

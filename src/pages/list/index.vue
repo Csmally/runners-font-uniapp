@@ -1,15 +1,10 @@
 <template>
-  <!-- <view>
-    我是第一是页
-    <view>
-      环境：{{envStr}}
-    </view>
-  </view> -->
   <scroll-view class="myScrollView" refresher-default-style="none" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
     <template slot="refresher">
       <RefreshLoading />
     </template>
     <view>
+      <button @click="dianji">按钮</button>
       <!-- 轮播图 -->
       <!-- 轮播图指示器颜色 indicator-color="#d5eef5" indicator-active-color="#81ccf5" -->
       <swiper class="card-swiper" previous-margin="70rpx" next-margin="70rpx" :circular="true" :autoplay="true" :indicator-dots="true" :interval="3000" :current="cardCur" :duration="500" @change="swiperChange">
@@ -28,7 +23,7 @@
         </view>
       </view>
       <view class="list">
-        <view class="listItem" v-for="(item,index) in list1" :key="index">
+        <view class="listItem" v-for="(item,index) in data" :key="index">
           <view class="itemTop">
             <view class="topLeft">
               <image :src="item.avatarUrl" mode="aspectFit" />
@@ -47,14 +42,18 @@
             <view class="middleMainInfo">
               <view class="mainInfo">
                 <image src="@/static/location.png" mode="aspectFit" />
-                <view>{{item.address}}</view>
+                <view>{{item.selfAddress}}</view>
               </view>
               <view class="mainInfo">
                 <image src="@/static/wallet.png" mode="aspectFit" />
-                <view>{{item.price}}</view>
+                <view>{{item.price}}元</view>
+              </view>
+              <view v-if="item.desc" class="mainInfo">
+                <image src="@/static/wallet.png" mode="aspectFit" />
+                <view>{{item.desc}}</view>
               </view>
             </view>
-            <image class="desimg" v-if="item.desimg" :src="item.desimg" mode="widthFix" />
+            <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" />
           </view>
           <view class="itemBottom">
 
@@ -67,95 +66,65 @@
 
 <script>
 import RefreshLoading from "@/components/refreshLoading.vue";
+import { uniRequest, jumpTo } from "@/utils/tool.js";
+import { getOpenid, getUserProfile } from "@/utils/login.js";
 export default {
   components: { RefreshLoading },
   data() {
     return {
-      //   envStr
-      // RefreshLoading: import.meta.env.MODE,
       cardCur: 0,
       list: [
         "/static/swiper1.jpeg",
         "/static/swiper2.jpeg",
         "/static/swiper3.jpeg",
       ],
-      list1: [
-        {
-          avatarUrl: "/static/avatar1.jpg",
-          nickName: "L.L.L",
-          address: "三号楼603",
-          price: "5.0元",
-          desimg1: "https://runners-1307290574.cos.ap-beijing.myqcloud.com/okok.png?q-sign-algorithm=sha1&q-ak=AKIDowok8UxKJBob1bXBGkWEVazY6tNXZI6rcJVVrkJEBgIiTPFKJ2Kw3HHiU7uL_CSH&q-sign-time=1647739796;1647743396&q-key-time=1647739796;1647743396&q-header-list=host&q-url-param-list=&q-signature=23b9f0d84519334fd78683568aec9fb9030d5189&x-cos-security-token=frzhQtOlyBGWUDQBMBcaUZNo9MC4FTaad76378d42d7b440fd6024c4eeafd7eb9LZLETHfJrR_9pUtuyYL2_VnpvKHL-lJVRZlIw2L86nfON7OktDmAsNtqDfL_zHKyU2rZvlrLZV6sBB1GVfdlOexJNRdSt9Ic_TQ90sutA4mQnP0GrZUbClB7Ox4T1IFdxCv_DtdLpJnza3v0nEFzoJ2iRWXjO0EQ_mcwAMutZgKizeIYFQD_JwaTDcFlSmj0",
-        },
-        {
-          avatarUrl: "/static/avatar2.jpg",
-          nickName: "shmily",
-          address: "一单元三号楼803",
-          price: "2.0元",
-        },
-        {
-          avatarUrl: "/static/avatar3.jpg",
-          nickName: "🐻",
-          address: "德馨楼-东-102",
-          price: "3.5元",
-          desimg1: "https://s1.ax1x.com/2022/03/20/qVcU1I.png",
-        },
-        {
-          avatarUrl: "/static/avatar4.jpg",
-          nickName: "Cross",
-          address: "科技楼实验室",
-          price: "6.0元",
-          desimg1: "https://www.runners.ink/desimg/bfYTZ6.png",
-        },
-        {
-          avatarUrl: "/static/avatar5.jpg",
-          nickName: "姚迪",
-          address: "9号楼阶梯教室3排5座",
-          price: "0.5元",
-          desimg1: "https://www.runners.ink/desimg/bfYTZ6.png",
-        },
-        {
-          avatarUrl: "/static/avatar6.jpg",
-          nickName: "篂篂点点",
-          address: "理工楼502",
-          price: "1.0元",
-          desimg1: "https://www.runners.ink/desimg/bfYTZ6.png",
-        },
-        {
-          avatarUrl: "/static/avatar7.jpg",
-          nickName: "爱得、",
-          address: "药品实验室3",
-          price: "1.5元",
-          desimg1: "https://www.runners.ink/desimg/okok.png",
-        },
-      ],
+      data: [],
       topRefresh: false,
       bottomRefresh: false,
-      dropdownShow: false,
       userCampus: null,
+      userInfo: null
     };
   },
-  onLoad() {
-    // uni.showTabBarRedDot({
-    //   index: 1,
-    // });
-  },
+  onLoad() {},
   onShow() {
-    let userCampus = uni.getStorageSync("userInfo")?.campus;
-    console.log("9898this", userCampus);
-    if (userCampus) {
-      for (const item of this.campuses) {
-        console.log("9898item", item);
-        if (userCampus === item.code) {
-          this.userCampus = item.name;
-          break;
-        }
-      }
-    } else {
-      this.userCampus = "游客模式";
-    }
+    this.userInfo = uni.getStorageSync("userInfo");
+    console.log("989811show", this.userInfo);
+  },
+  watch: {
+    "userInfo.campus"() {
+      console.log("9898campus变了", this.userInfo.type);
+      this.changeCampus();
+      this.getData();
+    },
   },
   methods: {
+    async dianji() {
+      let proInfo = await getUserProfile();
+      console.log('9898yonghu xinxi ',proInfo)
+    },
+    async getData() {
+      console.log("9898刷新数据", this.userInfo.type, this.userInfo.campus);
+      if (this.userInfo.type === "1") {
+        console.log("9898现在是客户模式了");
+        let resData = await uniRequest("order/search", "post", {dbTable:this.userInfo.campus});
+        this.data = resData.data
+        console.log('9898查询到的数据',resData)
+      } else {
+        console.log("9898游客模式下只显示十条数据");
+      }
+    },
+    changeCampus() {
+      if (this.userInfo.type === "1") {
+        for (const item of this.campuses) {
+          if (this.userInfo.campus === item.code) {
+            this.userCampus = item.name;
+            break;
+          }
+        }
+      } else {
+        this.userCampus = "游客模式";
+      }
+    },
     swiperChange(e) {
       this.cardCur = e.target.current;
     },
@@ -171,7 +140,7 @@ export default {
       }
     },
     changeDropdownShow() {
-      this.dropdownShow = !this.dropdownShow;
+      
     },
   },
 };
@@ -278,6 +247,7 @@ export default {
 .topLeft {
   display: flex;
   align-items: center;
+  background-color: red;
   image {
     width: 100rpx;
     height: 100rpx;

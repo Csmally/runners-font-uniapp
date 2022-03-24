@@ -15,6 +15,57 @@ export function uniRequest(url, method, data) {
     })
 }
 
+export function uploadFile(data) {
+    return new Promise((resolve, reject) => {
+        uni.uploadFile({
+            url: host + '/wx/txCos/upload', //仅为示例，非真实的接口地址
+            filePath: data.filePath,
+            name: "file",
+            formData: {
+                folder: data.folder ? data.folder : ""
+            },
+            success(res) {
+                console.log('9898upres', res)
+                resolve(JSON.parse(res.data))
+            },
+            fail(err) {
+                reject(err)
+            }
+        });
+    })
+}
+export function wxPay(data) {
+    return new Promise((resolve, reject) => {
+
+        uni.request({
+            url: host + '/wx/wxpay',
+            method: 'POST',
+            data: data,
+            success: (res) => {
+                uni.requestPayment({
+                    provider: "wxpay",
+                    timeStamp: res.data.data.timeStamp,
+                    package: "prepay_id=" + res.data.data.prepayId,
+                    nonceStr: res.data.data.nonceStr,
+                    signType: "MD5",
+                    paySign: res.data.data.paySign,
+                    success: (res1) => {
+                        console.log("支付成功", res1)
+                        resolve(res1)
+                    },
+                    fail: (res2) => {
+                        console.log("支付失败", res2)
+                        reject(res2)
+                    }
+                })
+            },
+            fail: (error) => {
+                reject(error)
+            }
+        })
+    })
+}
+
 export function jumpTo(url, param) {
     if (param) {
         let arr = []
