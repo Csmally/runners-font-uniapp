@@ -18,7 +18,7 @@
         <tui-grid-item class="grid grid_nomore" :hover="false" :bottomLine="false" :border="false" @click="confirm('nomore')">
           没有？
         </tui-grid-item>
-        <tui-grid-item class="grid grid_no" :hover="false" :bottomLine="false" :border="false" @click="confirm('no')">
+        <tui-grid-item class="grid grid_no" :hover="false" :bottomLine="false" :border="false" @click="confirm('tourist')">
           游客
         </tui-grid-item>
         <tui-grid-item class="grid grid_go" :hover="false" :bottomLine="false" :border="false" @click="confirm('go',campus)">
@@ -31,7 +31,7 @@
 
 <script>
 import { getOpenid, getUserProfile } from "@/utils/login.js";
-import { uniRequest, jumpTo } from "@/utils/tool.js";
+import { uniRequest, jumpTo, uploadFile, downloadFile } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
   data() {
@@ -53,6 +53,7 @@ export default {
     let userData = await uniRequest("userInfo/search", "post", { openid });
     if (userData.data) {
       //如果是老用户 返回用户信息，并存到本地
+      uni.setStorageSync("isFirst", false);
       uni.setStorageSync("userInfo", userData.data);
       this.loading = false;
       uni.switchTab({
@@ -61,39 +62,45 @@ export default {
     } else {
       this.loading = false;
       this.isModalShow = true;
-      // let info = {
-      //   openid,
-      //   campus: "qinghua",
-      // };
-      //   await uniRequest("userInfo_add", "post", info);
     }
   },
   methods: {
+    async saveUserInfo(type, value) {
+      let proInfo = await getUserProfile();
+      let cloudPhotoPath = null;
+      let localFilePath = null;
+      if (proInfo) {
+        localFilePath = await downloadFile({
+          url: proInfo.userInfo.avatarUrl,
+        });
+        cloudPhotoPath = await uploadFile({
+          filePath: localFilePath,
+          folder: "userAvatar/",
+        });
+        let info = {
+          avatarUrl: cloudPhotoPath,
+          gender: "1",
+          nickName: proInfo.userInfo.nickName,
+          openid: this.openid,
+          campus: type == "tourist" ? "" : value,
+          type: type == "tourist" ? "2" : "1",
+        };
+        uni.setStorageSync("userInfo", info);
+        uni.setStorageSync("isFirst", true);
+        await uniRequest("userInfo/add", "post", info);
+        uni.switchTab({
+          url: "/pages/self/index",
+        });
+      } else {
+        return;
+      }
+    },
     async confirm(type, value) {
       if (type === "nomore") {
-        console.log("9898此时需要跳转到新增学校页面");
         jumpTo("/pages/index/addCampus", { openid: this.openid });
       }
-      if (type === "no") {
-        console.log("9898此时需要跳转到list页面，只是不带用户信息");
-        let proInfo = await getUserProfile();
-        if (proInfo) {
-          let info = {
-            avatarUrl: proInfo.userInfo.avatarUrl,
-            gender: proInfo.userInfo.gender,
-            nickName: proInfo.userInfo.nickName,
-            openid: this.openid,
-            campus: "",
-            type: "2",
-          };
-          uni.setStorageSync("userInfo", info);
-          await uniRequest("userInfo/add", "post", info);
-          uni.switchTab({
-            url: "/pages/list/index",
-          });
-        } else {
-          return;
-        }
+      if (type === "tourist") {
+        await this.saveUserInfo(type, value);
       }
       if (type === "go") {
         if (value === null) {
@@ -103,26 +110,8 @@ export default {
             icon: true,
           };
           this.$refs.toast.show(options);
-          console.log("9898此时告诉用户需要先选择学校");
         } else {
-          let proInfo = await getUserProfile();
-          if (proInfo) {
-            let info = {
-              avatarUrl: proInfo.userInfo.avatarUrl,
-              gender: proInfo.userInfo.gender,
-              nickName: proInfo.userInfo.nickName,
-              openid: this.openid,
-              campus: value,
-              type: "1",
-            };
-            uni.setStorageSync("userInfo", info);
-            await uniRequest("userInfo/add", "post", info);
-            uni.switchTab({
-              url: "/pages/list/index",
-            });
-          } else {
-            return;
-          }
+          await this.saveUserInfo(type, value);
         }
       }
     },

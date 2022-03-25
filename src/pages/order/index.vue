@@ -3,7 +3,7 @@
     <div class="segmentedControl">
       <fui-segmented-control :values="values" type="text" bold color="#a3a2a2" activeColor="#000000" :current="currentPage" @click="changeTab"></fui-segmented-control>
     </div>
-    <view class="content">
+    <view>
       <NewOrder v-show="currentPage===0" />
       <OrderIng v-show="currentPage===1" />
       <OrderEd v-show="currentPage===2" />
@@ -27,14 +27,7 @@ export default {
     };
   },
   onLoad() {},
-  onShow() {
-    uni.authorize({
-      scope: "userInfo",
-      success: (res) => {
-        resolve('9898get',res);
-      },
-    });
-  },
+  onShow() {},
   methods: {
     changeTab(value) {
       console.log("9898tab", value);
@@ -57,7 +50,5 @@ export default {
   top: 0;
   background-color: #ffffff;
   z-index: 999;
-}
-.content {
 }
 </style>

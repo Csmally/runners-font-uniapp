@@ -217,17 +217,11 @@ export default {
       });
       let cloudPhotoPath = null;
       if (this.form.localphotos) {
-        cloudPhotoPath = (
-          await uploadFile({
-            filePath: this.form.localphotos.path,
-            folder: "descImg/",
-          })
-        ).data.Location.replace(
-          "runners-1307290574.cos.ap-beijing.myqcloud.com",
-          "https://static.runners.ink"
-        );
+        cloudPhotoPath = await uploadFile({
+          filePath: this.form.localphotos.path,
+          folder: "descImg/",
+        });
       }
-      console.log("9898tupian", cloudPhotoPath);
       console.log("9898支付跑过去了");
       this.isContentShow = false;
       this.submitLoading = true;

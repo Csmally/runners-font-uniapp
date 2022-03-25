@@ -319,7 +319,7 @@ export default {
         openid: this.openid,
       });
       this.submitLoading = false;
-      jumpTo("/pages/result/index",{title:"提交成功！"});
+      jumpTo("/pages/result/index", { title: "提交成功！", mark: "back" });
     },
   },
 };

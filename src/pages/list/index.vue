@@ -4,7 +4,6 @@
       <RefreshLoading />
     </template>
     <view>
-      <button @click="dianji">按钮</button>
       <!-- 轮播图 -->
       <!-- 轮播图指示器颜色 indicator-color="#d5eef5" indicator-active-color="#81ccf5" -->
       <swiper class="card-swiper" previous-margin="70rpx" next-margin="70rpx" :circular="true" :autoplay="true" :indicator-dots="true" :interval="3000" :current="cardCur" :duration="500" @change="swiperChange">
@@ -26,7 +25,11 @@
         <view class="listItem" v-for="(item,index) in data" :key="index">
           <view class="itemTop">
             <view class="topLeft">
-              <image :src="item.avatarUrl" mode="aspectFit" />
+              <view class="avatar">
+                <image class="avatarImg" :src="item.avatarUrl" mode="aspectFit" />
+                <image v-if="item.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
+                <image v-if="item.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
+              </view>
               <view class="nickName">{{item.nickName}}</view>
             </view>
             <view class="topRight">
@@ -41,16 +44,20 @@
           <view class="itemMiddle">
             <view class="middleMainInfo">
               <view class="mainInfo">
-                <image src="@/static/location.png" mode="aspectFit" />
-                <view>{{item.selfAddress}}</view>
+                <image src="@/static/goods.png" mode="aspectFit" />
+                <view>{{item.goodsName}}</view>
+              </view>
+              <view class="mainInfo">
+                <image src="@/static/store.png" mode="aspectFit" />
+                <view>{{item.goodsAddress}}</view>
               </view>
               <view class="mainInfo">
                 <image src="@/static/wallet.png" mode="aspectFit" />
                 <view>{{item.price}}元</view>
               </view>
               <view v-if="item.desc" class="mainInfo">
-                <image src="@/static/wallet.png" mode="aspectFit" />
-                <view>{{item.desc}}</view>
+                <image src="@/static/chat.png" mode="aspectFit" />
+                <view> * * * * * * </view>
               </view>
             </view>
             <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" />
@@ -82,7 +89,7 @@ export default {
       topRefresh: false,
       bottomRefresh: false,
       userCampus: null,
-      userInfo: null
+      userInfo: null,
     };
   },
   onLoad() {},
@@ -98,17 +105,13 @@ export default {
     },
   },
   methods: {
-    async dianji() {
-      let proInfo = await getUserProfile();
-      console.log('9898yonghu xinxi ',proInfo)
-    },
     async getData() {
-      console.log("9898刷新数据", this.userInfo.type, this.userInfo.campus);
       if (this.userInfo.type === "1") {
         console.log("9898现在是客户模式了");
-        let resData = await uniRequest("order/search", "post", {dbTable:this.userInfo.campus});
-        this.data = resData.data
-        console.log('9898查询到的数据',resData)
+        let resData = await uniRequest("order/search", "post", {
+          dbTable: this.userInfo.campus,
+        });
+        this.data = resData.data;
       } else {
         console.log("9898游客模式下只显示十条数据");
       }
@@ -128,20 +131,15 @@ export default {
     swiperChange(e) {
       this.cardCur = e.target.current;
     },
-    scrollTop(e) {
+    async scrollTop(e) {
       if (this.topRefresh === false) {
         this.topRefresh = true;
-        console.log("9898顶部", e);
-        setTimeout(() => {
-          this.topRefresh = false;
-        }, 2500);
+        await this.getData()
       } else {
         return;
       }
     },
-    changeDropdownShow() {
-      
-    },
+    changeDropdownShow() {},
   },
 };
 </script>
@@ -207,6 +205,7 @@ export default {
   align-items: center;
   padding: 20rpx;
   font-weight: bold;
+  z-index: 2;
 }
 .searchText {
   width: 150rpx;
@@ -247,11 +246,22 @@ export default {
 .topLeft {
   display: flex;
   align-items: center;
-  background-color: red;
-  image {
-    width: 100rpx;
-    height: 100rpx;
-    border-radius: 50rpx;
+  .avatar{
+    position: relative;
+  }
+  .avatarImg {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 60rpx;
+  }
+  .genderImg {
+    position: absolute;
+    top: 0;
+    right: -15rpx;
+    width: 46rpx;
+    height: 46rpx;
+    border-radius: 23rpx;
+    background-color: #ffffff;
   }
 }
 .nickName {

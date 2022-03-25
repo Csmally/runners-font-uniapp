@@ -26,14 +26,32 @@ export function uploadFile(data) {
             },
             success(res) {
                 console.log('9898upres', res)
-                resolve(JSON.parse(res.data))
+                resolve(JSON.parse(res.data).data.Location.replace(
+                    "runners-1307290574.cos.ap-beijing.myqcloud.com",
+                    "https://static.runners.ink"
+                ))
             },
             fail(err) {
-                reject(err)
+                resolve("https://static.runners.ink/project/runnerLogo.png")
             }
         });
     })
 }
+
+export function downloadFile(data) {
+    return new Promise((resolve, reject) => {
+        uni.downloadFile({
+            url: data.url,
+            success(res) {
+                resolve(res.tempFilePath)
+            },
+            fail(err) {
+                reject(err)
+            }
+        })
+    })
+}
+
 export function wxPay(data) {
     return new Promise((resolve, reject) => {
 
@@ -106,6 +124,7 @@ export function setUpMenuInfo() {
             let menuRight = result.screenWidth - menuButtonInfo.right + 'px'
             let menuTop = menuButtonInfo.top + 'px'
             let contentTop = result.statusBarHeight + 44 + 'px'
+            let allHeight = menuButtonInfo.height + menuButtonInfo.top + 'px'
 
             let menuInfo = {
                 statusBarHeight: statusBarHeight, //状态栏高度----用来给自定义导航条页面的顶部导航条设计padding-top使用：目的留出系统的状态栏区域
@@ -115,6 +134,7 @@ export function setUpMenuInfo() {
                 menuRight: menuRight, //右侧的胶囊距离右侧屏幕距离--用来给自定义导航条页面的左侧胶囊设置使用
                 menuTop: menuTop, //右侧的胶囊顶部距离屏幕顶部的距离--用来给自定义导航条页面的左侧胶囊设置使用
                 contentTop: contentTop, //内容区距离页面最上方的高度--用来给自定义导航条页面的内容区定位距离使用
+                allHeight: allHeight
             }
             uni.setStorageSync('menuInfo', menuInfo)
         },
