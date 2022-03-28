@@ -93,9 +93,10 @@ export default {
     };
   },
   onLoad() {},
-  onShow() {
+  async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     console.log("989811show", this.userInfo);
+    await this.getData()
   },
   watch: {
     "userInfo.campus"() {
@@ -114,6 +115,10 @@ export default {
         this.data = resData.data;
       } else {
         console.log("9898游客模式下只显示十条数据");
+        let resData = await uniRequest("order/search", "post", {
+          dbTable: "beida",
+        });
+        this.data = resData.data;
       }
     },
     changeCampus() {
@@ -135,6 +140,7 @@ export default {
       if (this.topRefresh === false) {
         this.topRefresh = true;
         await this.getData()
+        this.topRefresh = false;
       } else {
         return;
       }

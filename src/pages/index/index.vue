@@ -31,7 +31,7 @@
 
 <script>
 import { getOpenid, getUserProfile } from "@/utils/login.js";
-import { uniRequest, jumpTo, uploadFile, downloadFile } from "@/utils/tool.js";
+import { uniRequest, jumpTo, getFileName } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
   data() {
@@ -70,13 +70,15 @@ export default {
       let cloudPhotoPath = null;
       let localFilePath = null;
       if (proInfo) {
-        localFilePath = await downloadFile({
-          url: proInfo.userInfo.avatarUrl,
-        });
-        cloudPhotoPath = await uploadFile({
-          filePath: localFilePath,
+        let resData = await uniRequest("txCos/saveAvatar", "post", {
           folder: "userAvatar/",
+          filePath: proInfo.userInfo.avatarUrl,
+          fileName: getFileName(),
         });
+        cloudPhotoPath = resData.data.Location.replace(
+          "runners-1307290574.cos.ap-beijing.myqcloud.com",
+          "https://static.runners.ink"
+        );
         let info = {
           avatarUrl: cloudPhotoPath,
           gender: "1",

@@ -101,6 +101,14 @@ export function jumpTo(url, param) {
     }
 }
 
+export function getFileName(suffix) {
+    if (suffix) {
+        return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).substr(0, 8) + '.' + suffix
+    } else {
+        return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).toString().substr(0, 8) + '.png'
+    }
+}
+
 export function setUpMenuInfo() {
     uni.getSystemInfo({
         success: (result) => {
