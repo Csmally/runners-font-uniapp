@@ -19,6 +19,18 @@
             }
         },
         {
+            "path": "pages/list/moreInfo",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/chatRoom/index",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
             "path": "pages/order/index",
             "style": {
                 "navigationBarTitleText": "订单"
@@ -27,7 +39,6 @@
         {
             "path": "pages/self/index",
             "style": {
-                // "navigationBarTitleText": "我的"
                 "navigationStyle": "custom"
             }
         },
@@ -39,6 +50,12 @@
         },
         {
             "path": "pages/result/index",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/chooseCampus/index",
             "style": {
                 "navigationStyle": "custom"
             }

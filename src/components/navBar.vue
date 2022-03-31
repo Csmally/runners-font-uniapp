@@ -3,7 +3,7 @@
     <view v-if="mark==='all'" class="menu_btn" :style="{ position: 'fixed',top:menuTop,left:menuRight,width:menuWidth,height:menuHeight, border: '1rpx solid #ddd',borderRadius:menuBorderRadius, backgroundColor: '#ffffff'}">
       <uni-icons @click="goToBack" class="arrowleft" type="arrowleft" :color="'#000'" size="20" />
       <text class="text_box"></text>
-      <uni-icons @click="goToHome" class="home" type="home" :color="'#000'" size="20" />
+      <tui-icon @click="goToHome" class="home" :color="'#000'" size="20" name="home-fill"></tui-icon>
     </view>
     <view v-if="mark==='back'" class="menu_btn" :style="{ position: 'fixed',top:menuTop,left:menuRight,width:menuWidth,height:menuHeight }">
       <uni-icons @click="goToBack" class="arrowleft" type="arrowleft" :color="'#000'" size="25" />
@@ -11,11 +11,15 @@
       <!-- <uni-icons @click="goToHome" class="home" type="home" :color="'#000'" size="20" /> -->
     </view>
     <view v-if="mark==='home'" class="menu_btn" :style="{ position: 'fixed',top:menuTop,left:menuRight,width:menuWidth,height:menuHeight }">
-      <uni-icons @click="goToHome" class="arrowleft" type="home" :color="'#000'" size="25" />
+      <tui-icon @click="goToHome" class="arrowleft" :color="'#000'" size="25" name="home-fill"></tui-icon>
+    </view>
+    <view v-if="mark==='chat'" class="menu_btn" :style="{ position: 'fixed',top:menuTop,left:menuRight,width:menuWidth,height:menuHeight }"> 
+      <tui-icon @click="goToChatRoom" class="arrowleft" :color="'#000'" size="25" name="community-fill"></tui-icon>
     </view>
   </view>
 </template>
 <script>
+import { jumpTo } from "@/utils/tool.js";
 export default {
   props: {
     mark: {
@@ -44,11 +48,10 @@ export default {
       uni.switchTab({
         url: "/pages/list/index",
       });
-      //下方方法也可以回到首页 还可以传参 但是不建议使用---因为此方法会关闭其他所有页面（导致再次打开别的页面时候 会再次触发别的页面的onLoad）
-      // uni.reLaunch({
-      //   url: '/pages/index/index?id=1'
-      // })
     },
+    goToChatRoom() {
+      jumpTo("/pages/chatRoom/index");
+    }
   },
 };
 </script>

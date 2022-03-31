@@ -1,4 +1,5 @@
 <template>
+  <tui-toast ref="toast" position="center"></tui-toast>
   <scroll-view class="myScrollView" refresher-default-style="none" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
     <template slot="refresher">
       <RefreshLoading />
@@ -22,7 +23,7 @@
         </view>
       </view>
       <view class="list">
-        <view class="listItem" v-for="(item,index) in data" :key="index">
+        <view class="listItem" v-for="(item,index) in data" :key="index" @click="selectItem(item)">
           <view class="itemTop">
             <view class="topLeft">
               <view class="avatar">
@@ -74,7 +75,6 @@
 <script>
 import RefreshLoading from "@/components/refreshLoading.vue";
 import { uniRequest, jumpTo } from "@/utils/tool.js";
-import { getOpenid, getUserProfile } from "@/utils/login.js";
 export default {
   components: { RefreshLoading },
   data() {
@@ -96,7 +96,7 @@ export default {
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     console.log("989811show", this.userInfo);
-    await this.getData()
+    await this.getData();
   },
   watch: {
     "userInfo.campus"() {
@@ -108,20 +108,23 @@ export default {
   methods: {
     async getData() {
       if (this.userInfo.type === "1") {
-        console.log("9898现在是客户模式了");
+        console.log("9898现在是客户模式了", this.userInfo.campus);
         let resData = await uniRequest("order/search", "post", {
           dbTable: this.userInfo.campus,
+          param: { status: 1 },
         });
         this.data = resData.data;
       } else {
         console.log("9898游客模式下只显示十条数据");
         let resData = await uniRequest("order/search", "post", {
           dbTable: "beida",
+          param: { status: 1 },
         });
         this.data = resData.data;
       }
     },
     changeCampus() {
+      console.log("9898咋没有了", this.campuses);
       if (this.userInfo.type === "1") {
         for (const item of this.campuses) {
           if (this.userInfo.campus === item.code) {
@@ -139,13 +142,26 @@ export default {
     async scrollTop(e) {
       if (this.topRefresh === false) {
         this.topRefresh = true;
-        await this.getData()
+        await this.getData();
         this.topRefresh = false;
       } else {
         return;
       }
     },
-    changeDropdownShow() {},
+    changeDropdownShow() {
+      jumpTo("/pages/chooseCampus/index");
+    },
+    selectItem(item) {
+      if (this.userInfo.type === "1") {
+        console.log("9898item", item);
+        jumpTo("/pages/list/moreInfo", { ...item });
+      } else {
+        let options = {
+          title: "游客模式下暂时无法查看更多",
+        };
+        this.$refs.toast.show(options);
+      }
+    },
   },
 };
 </script>
@@ -236,13 +252,6 @@ export default {
   padding: 20rpx;
   border-bottom: 1px dashed #e2dfdf;
 }
-.campusContent {
-  padding: 10rpx;
-  background-color: #d0ecf3;
-  border-radius: 10rpx;
-  width: 300rpx;
-  height: 500rpx;
-}
 .itemTop {
   display: flex;
   align-items: center;
@@ -252,7 +261,7 @@ export default {
 .topLeft {
   display: flex;
   align-items: center;
-  .avatar{
+  .avatar {
     position: relative;
   }
   .avatarImg {

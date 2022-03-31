@@ -9,7 +9,7 @@
           <view class="tui-default">
             <fui-input v-model="form.goodsName" label="名称" required textRight placeholder="请输入商品名称" />
             <fui-input v-model="form.goodsAddress" label="地址" required textRight placeholder="请输入商品购买地址" />
-            <fui-input v-model="form.goodsPrice" label="价格" type="digit" required textRight placeholder="请输入商品预估价格" />
+            <fui-input v-model="form.goodsPrice" label="价格" type="digit" required textRight placeholder="商品预估价格(代取快递等输入0)" />
           </view>
         </template>
       </tui-card>
@@ -19,10 +19,10 @@
       <tui-card :image="card.self.img" :title="card.self.title">
         <template slot="body">
           <view class="tui-default">
+            <fui-input v-model="form.selfAddress" label="送达地址" required textRight placeholder="请输入您希望的送达地址" />
+            <fui-input v-model="form.mobile" label="手机号码" type="number" textRight placeholder="请输入手机号码" />
             <fui-input v-model="form.wxAccount" label="微信账号" textRight placeholder="请输入微信账号" />
             <fui-input v-model="form.qqAccount" label="QQ账号" textRight placeholder="请输入QQ账号" />
-            <fui-input v-model="form.mobile" label="手机号码" type="number" textRight placeholder="请输入手机号码" />
-            <fui-input v-model="form.selfAddress" label="送达地址" textRight placeholder="请输入您希望的送达地址" />
           </view>
         </template>
       </tui-card>
@@ -64,16 +64,13 @@
 </template>
 
 <script>
-import navigationBar from "@/components/navigationBar.vue";
-import NavBar from "@/components/navBar.vue";
 import { uniRequest, jumpTo, wxPay, uploadFile } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64, orderBase64 } from "@/base64/index.js";
 export default {
-  components: { navigationBar, NavBar },
   onInit() {},
   onLoad() {},
   onShow() {
-    console.log("33311");
+    this.userInfo = uni.getStorageSync("userInfo");
   },
   onReady() {
     console.log("555");
@@ -83,6 +80,7 @@ export default {
       orderBase64,
       addCampusBase64,
       commonBase64,
+      userInfo: null,
       form: {
         goodsName: null,
         goodsAddress: null,
@@ -101,6 +99,7 @@ export default {
         { value: "goodsAddress", label: "请输入商品购买地址" },
         { value: "goodsPrice", label: "请输入商品预估价格" },
         { value: "price", label: "请输入酬劳" },
+        { value: "selfAddress", label: "请输入您希望的送达地址" }
       ],
       isContentShow: true,
       card: {
@@ -199,7 +198,6 @@ export default {
       console.log("上传失败：", e);
     },
     async submit() {
-      let userInfo = uni.getStorageSync("userInfo");
       for (const item of this.tips) {
         if (!this.form[item.value]) {
           let options = {
@@ -213,7 +211,7 @@ export default {
       }
       await wxPay({
         price: Number(this.form.price).toFixed(2),
-        openid: userInfo.openid,
+        openid: this.userInfo.openid,
       });
       let cloudPhotoPath = null;
       if (this.form.localphotos) {
@@ -229,11 +227,12 @@ export default {
         ...this.form,
         photos: cloudPhotoPath,
         price: Number(this.form.price).toFixed(2),
-        openid: userInfo.openid,
-        dbTable: userInfo.campus,
-        avatarUrl: userInfo.avatarUrl,
-        gender: userInfo.gender,
-        nickName: userInfo.nickName,
+        openid: this.userInfo.openid,
+        dbTable: this.userInfo.campus,
+        avatarUrl: this.userInfo.avatarUrl,
+        gender: this.userInfo.gender,
+        nickName: this.userInfo.nickName,
+        campus: this.userInfo.campus,
         status: 1,
       });
       for (const key in this.form) {

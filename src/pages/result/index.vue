@@ -1,6 +1,6 @@
 <template>
   <NavBar :mark="mark"/>
-  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" />
+  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" :timer="timer"/>
 </template>
 
 <script>
@@ -12,6 +12,10 @@ export default {
     mark: {
       type: String,
       default: "all",
+    },
+    timer: {
+      type: Boolean,
+      default: false,
     },
   },
   onLoad(option) {

@@ -31,7 +31,7 @@
 
 <script>
 import { getOpenid, getUserProfile } from "@/utils/login.js";
-import { uniRequest, jumpTo, getFileName } from "@/utils/tool.js";
+import { uniRequest, jumpTo, getFileName, reSetArr } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 export default {
   data() {
@@ -44,7 +44,10 @@ export default {
       openid: null,
     };
   },
-  onLoad() {},
+  async onLoad() {
+    let myCampuses = await uniRequest("campus/search", "post");
+    reSetArr(this.campuses, myCampuses.data);
+  },
   async onShow() {
     this.loading = true;
     //获取是否新用户

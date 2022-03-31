@@ -8,7 +8,7 @@ export default {
   props: {
     opacity: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     titleText: {
       type: String,

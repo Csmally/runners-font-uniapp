@@ -2,12 +2,14 @@
   <view class="resultCanvas">
     <canvas style="width:750rpx;height:520rpx" type="2d" id="myCanvas"></canvas>
     <text class="resultStr" :style="'color:'+titleColor">{{title}}</text>
+    <view class="resultStr" v-if="timer" :style="'color:'+titleColor">
+      {{"("+time+"）"}}
+    </view>
   </view>
 </template>
 
-
-
 <script>
+import { jumpTo } from "@/utils/tool.js";
 export default {
   onInit() {
     console.log("111");
@@ -67,6 +69,15 @@ export default {
         };
         canvas.requestAnimationFrame(renderAnimation);
       });
+    if (this.timer) {
+      let aa = setInterval(() => {
+        if(this.time===1){
+          clearInterval(aa)
+          jumpTo("/pages/chatRoom/index");
+        }
+        this.time--;
+      }, 1000);
+    }
   },
   props: {
     title: {
@@ -80,6 +91,10 @@ export default {
     canvasColor: {
       type: String,
       default: "#68E534",
+    },
+    timer: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -102,6 +117,7 @@ export default {
       canvasWidth: null,
       canvasHeight: null,
       endCircular: 1.5,
+      time: 6,
     };
   },
   methods: {
@@ -162,6 +178,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .resultStr {

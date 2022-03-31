@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <tui-toast ref="toast" position="center"></tui-toast>
+    <!-- <tui-toast ref="toast" position="center"></tui-toast> -->
     <view class="info">
       <view v-if="userInfo" class="infotop" :style="'top:'+allHeight">
         <view class="avatar">
@@ -41,6 +41,13 @@
     <view class="content">
       <ContentInfo />
     </view>
+    <!-- 底部弹出 -->
+    <tui-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="isPopupShow" @close="closePopup">
+      <view class="noallow">
+        <p class="p1">由于微信隐私政策原因，若您的性别数据错误，您可以在本页面“编辑资料”中自行修改</p>
+        <p class="p2">（此操作不会影响您的微信资料）</p>
+      </view>
+    </tui-bottom-popup>
   </view>
 </template>
 
@@ -53,28 +60,26 @@ export default {
     return {
       allHeight: null,
       userInfo: null,
-      isFirst: false,
+      isPopupShow: false,
     };
   },
-  onLoad() {
-    let isFirst = uni.getStorageSync("isFirst");
-    if (isFirst) {
-      let options = {
-        title: "由于微信隐私政策原因，如您的性别数据错误，您可以在本页面“编辑资料”中自行修改（此操作不会影响您的微信资料）",
-        duration: 3000
-      };
-      this.$refs.toast.show(options);
-      uni.setStorageSync("isFirst", false);
-    }
-  },
+  onLoad() {},
   onShow() {
     this.allHeight = uni.getStorageSync("menuInfo").allHeight;
     this.userInfo = uni.getStorageSync("userInfo");
+    let isFirst = uni.getStorageSync("isFirst");
+    if (isFirst) {
+      this.isPopupShow = true;
+    }
   },
   methods: {
+    closePopup() {
+      this.isPopupShow = false;
+      uni.setStorageSync("isFirst", false);
+    },
     editInfo() {
       jumpTo("/pages/self/editInfo");
-    }
+    },
   },
 };
 </script>
@@ -185,5 +190,24 @@ export default {
   border-top-left-radius: 60rpx;
   border-top-right-radius: 60rpx;
   background-color: #ffffff;
+}
+.noallow {
+  height: 20vh;
+  background-image: url("/static/noAllow.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .p1{
+    font-size: 35rpx;
+    margin: 0 45rpx;
+  }
+  .p2{
+    margin-top: 50rpx;
+    color: #a3a2a2;
+  }
 }
 </style>
