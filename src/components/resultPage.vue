@@ -21,7 +21,6 @@ export default {
     console.log("9898context");
   },
   mounted() {
-    console.log("555");
     uni
       .createSelectorQuery()
       .in(this)
@@ -71,9 +70,9 @@ export default {
       });
     if (this.timer) {
       let aa = setInterval(() => {
-        if(this.time===1){
-          clearInterval(aa)
-          jumpTo("/pages/chatRoom/index");
+        if (this.time === 1) {
+          clearInterval(aa);
+          jumpTo("/pages/chatRoom/index", this.orderInfo);
         }
         this.time--;
       }, 1000);
@@ -95,6 +94,10 @@ export default {
     timer: {
       type: Boolean,
       default: false,
+    },
+    orderInfo: {
+      type: Object,
+      default: null,
     },
   },
   data() {

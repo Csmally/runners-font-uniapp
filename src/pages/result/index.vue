@@ -1,6 +1,6 @@
 <template>
-  <NavBar :mark="mark"/>
-  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" :timer="timer"/>
+  <NavBar :mark="mark" :orderInfo="orderInfo"/>
+  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" :timer="timer" :orderInfo="orderInfo"/>
 </template>
 
 <script>
@@ -22,12 +22,20 @@ export default {
     this.title = option.title;
     this.titleColor = option.titleColor;
     this.canvasColor = option.canvasColor;
+    this.orderInfo = JSON.parse(option.orderInfo)
+    debugger
+    console.log('9898咋回事',option)
+    debugger
+  },
+  onShow() {
+    console.log('9898传过来了没11',this.orderInfo)
   },
   data() {
     return {
       title: null,
       titleColor: null,
       canvasColor: null,
+      orderInfo: null
     };
   },
   methods: {},

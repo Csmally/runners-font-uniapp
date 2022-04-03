@@ -73,7 +73,7 @@ export default {
     this.userInfo = uni.getStorageSync("userInfo");
   },
   onReady() {
-    console.log("555");
+    
   },
   data() {
     return {

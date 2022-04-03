@@ -26,6 +26,10 @@ export default {
       type: String,
       default: "all",
     },
+    orderInfo: {
+      type: Object,
+      default: null,
+    }
   },
   data() {
     return {
@@ -50,7 +54,7 @@ export default {
       });
     },
     goToChatRoom() {
-      jumpTo("/pages/chatRoom/index");
+      jumpTo("/pages/chatRoom/index",this.orderInfo);
     }
   },
 };

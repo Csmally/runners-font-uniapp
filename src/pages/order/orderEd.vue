@@ -122,7 +122,7 @@ export default {
     }, 1000);
   },
   onReady() {
-    console.log("555");
+    
   },
   data() {
     return {

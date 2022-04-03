@@ -32,6 +32,7 @@ export function uploadFile(data) {
                 ))
             },
             fail(err) {
+                // reject(err)
                 resolve("https://static.runners.ink/project/runnerLogo.png")
             }
         });

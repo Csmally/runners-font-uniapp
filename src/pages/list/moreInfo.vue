@@ -148,8 +148,17 @@ export default {
         },
       });
       if (resData.code === "1") {
+        let searData = await uniRequest("order/search", "post", {
+          dbTable: this.orderInfo.campus,
+          param: { id: this.orderInfo.id },
+        });
         this.isPopupShow = false;
-        jumpTo("/pages/result/index", { title: "runner,GO！", mark: "chat", timer: true });
+        jumpTo("/pages/result/index", {
+          title: "runner,GO！",
+          mark: "chat",
+          timer: true,
+          orderInfo: JSON.stringify(searData.data[0])
+        });
       } else {
         let options = {
           title: "可惜了，手速慢了一丢丢，换个订单继续吧～",
