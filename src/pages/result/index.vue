@@ -22,10 +22,7 @@ export default {
     this.title = option.title;
     this.titleColor = option.titleColor;
     this.canvasColor = option.canvasColor;
-    this.orderInfo = JSON.parse(option.orderInfo)
-    debugger
-    console.log('9898咋回事',option)
-    debugger
+    this.orderInfo = option.orderInfo?JSON.parse(option.orderInfo):null
   },
   onShow() {
     console.log('9898传过来了没11',this.orderInfo)

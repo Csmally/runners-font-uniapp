@@ -220,7 +220,6 @@ export default {
           folder: "descImg/",
         });
       }
-      console.log("9898支付跑过去了");
       this.isContentShow = false;
       this.submitLoading = true;
       await uniRequest("order/add", "post", {
