@@ -27,7 +27,8 @@
         {
             "path": "pages/chatRoom/index",
             "style": {
-                "navigationStyle": "custom"
+                "navigationStyle": "custom",
+                "disableScroll": true
             }
         },
         {
@@ -74,7 +75,8 @@
         "selectedColor": "#1A1818",
         "borderStyle": "white",
         "backgroundColor": "#FFFFFF",
-        "list": [{
+        "list": [
+            {
                 "pagePath": "pages/list/index",
                 "iconPath": "static/list.png",
                 "selectedIconPath": "static/listSelect.png",

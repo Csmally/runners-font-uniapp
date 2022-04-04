@@ -1,10 +1,13 @@
 <template>
   <view class="container" v-if="userInfo">
     <NavBar mark="home" />
-    <navigationBar :titleText="userInfo.openid===orderInfo.openid?orderInfo.runnerNickName:orderInfo.nickName" />
-    <view :style="'height:'+allHeight"></view>
-    <scroll-view id="chatbox" scroll-y :scroll-top="scrollTop" class="chatbox" :style="'top:'+allHeight">
-      <view class="chatInfo" v-for="(item,index) in allChatLog" :key="index">
+    <view class="chattitle" :style="{paddingTop:statusBarHeight}">
+      <view class="name">
+        {{userInfo.openid===orderInfo.openid?orderInfo.runnerNickName:orderInfo.nickName}}
+      </view>
+    </view>
+    <scroll-view scroll-y :scroll-into-view="showid" class="chatbox" id="chatbox">
+      <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
         <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
           <image :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
           <view class="textright">
@@ -27,8 +30,8 @@
     </scroll-view>
     <view class="operationbar">
       <view class="inputbox">
-        <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" />
-        <!-- <input style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
+        <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
+        <input style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" />
       </view>
     </view>
   </view>
@@ -44,15 +47,18 @@ export default {
   },
   onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
-    this.allHeight = uni.getStorageSync("menuInfo").allHeight;
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
     socketObj.emit("isChatLogTable", { orderid: this.orderInfo.id });
     socketObj.on("getAllChatLog", (data) => {
       this.allChatLog = data.allChatLog;
+      if (this.allChatLog.length > 0) {
+        this.showid = "showid" + (this.allChatLog.length - 1);
+      }
     });
     socketObj.on("message", (data) => {
       this.allChatLog.push(data.msgData);
+      this.showid = "showid" + (this.allChatLog.length - 1);
     });
   },
   data() {
@@ -64,7 +70,9 @@ export default {
       msgType: "text",
       mediaUrl: "",
       allChatLog: [],
-      scrollTop: 0
+      scrollTop: 0,
+      statusBarHeight: uni.getStorageSync("menuInfo").statusBarHeight,
+      showid: null,
     };
   },
   methods: {
@@ -88,14 +96,7 @@ export default {
         msgType: this.msgType,
         fromOpenid: this.userInfo.openid,
       });
-
-      // let query = uni.createSelectorQuery();
-      // query.select("#chatbox").boundingClientRect();
-      // query.exec((res) => {
-      //   console.log("9898res", res);
-      //   this.scrollTop = res[0].bottom+res[0].height
-      // });
-
+      this.showid = "showid" + (this.allChatLog.length - 1);
       this.inputValue = "";
       this.msgType = "text";
       this.mediaUrl = "";
@@ -107,14 +108,23 @@ export default {
 <style lang="scss">
 .container {
   height: 100vh;
-  position: relative;
+}
+.chattitle {
+  height: 11vh;
+  box-sizing: border-box;
+  .name {
+    font-size: 33rpx;
+    color: #000;
+    font-weight: 500;
+    text-align: center;
+    height: 44px;
+    line-height: 44px;
+  }
 }
 .chatbox {
-  position: absolute;
-  bottom: 10vh;
   background-color: #f8f8f8;
   width: 100%;
-//   overflow: auto;
+  height: 78vh;
   .chatInfo {
     margin: 35rpx 25rpx;
     .chatright {
@@ -185,14 +195,12 @@ export default {
   }
 }
 .operationbar {
-  position: absolute;
-  bottom: 0;
   background-color: #f8f8f8;
   border-top: 1px solid #cccaca;
-  height: 12vh;
+  height: 11vh;
   width: 100%;
   .inputbox {
-    height: 70rpx;
+    height: 50rpx;
     margin: 20rpx 20rpx 0 20rpx;
     padding: 15rpx 25rpx;
     border-radius: 10rpx;

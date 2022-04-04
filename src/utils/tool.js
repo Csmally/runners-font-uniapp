@@ -133,7 +133,7 @@ export function setUpMenuInfo() {
             let menuRight = result.screenWidth - menuButtonInfo.right + 'px'
             let menuTop = menuButtonInfo.top + 'px'
             let contentTop = result.statusBarHeight + 44 + 'px'
-            let allHeight = menuButtonInfo.height + menuButtonInfo.top + 6 + 'px'
+            let allHeight = result.statusBarHeight + 44 + 'px'
 
             let menuInfo = {
                 statusBarHeight: statusBarHeight, //状态栏高度----用来给自定义导航条页面的顶部导航条设计padding-top使用：目的留出系统的状态栏区域
