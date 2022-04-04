@@ -1,6 +1,5 @@
 <template>
   <view class="container">
-    <button @click="dianji">点击</button>
     <!-- <tui-toast ref="toast" position="center"></tui-toast> -->
     <view class="info">
       <view v-if="userInfo" class="infotop" :style="'top:'+allHeight">
@@ -74,9 +73,6 @@ export default {
     }
   },
   methods: {
-    dianji() {
-      console.log('9898get22',this.socketObj)
-    },
     closePopup() {
       this.isPopupShow = false;
       uni.setStorageSync("isFirst", false);

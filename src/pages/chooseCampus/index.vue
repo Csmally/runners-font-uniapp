@@ -3,7 +3,6 @@
     <NavBar />
     <navigationBar titleText="选择社区" />
     <view :style="'height:'+allHeight"></view>
-    <!-- <button @click="dianji">点击</button> -->
     <view class="title" :style="'top:'+allHeight">
       <view class="current">{{currentName}}</view>
       <view class="searchInput">
@@ -57,9 +56,6 @@ export default {
     this.getCampusName(userInfo.campus);
   },
   methods: {
-    dianji() {
-      console.log("9898社区", this.campuses);
-    },
     getCampusName(code) {
       if (code) {
         this.myCampuses.forEach((item) => {
