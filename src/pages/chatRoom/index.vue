@@ -49,14 +49,15 @@ export default {
     this.userInfo = uni.getStorageSync("userInfo");
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
-    socketObj.emit("isChatLogTable", { orderid: this.orderInfo.id });
+    let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
+    socketObj.emit("isChatLogTable", { orderid });
     socketObj.on("getAllChatLog", (data) => {
       this.allChatLog = data.allChatLog;
       if (this.allChatLog.length > 0) {
         this.showid = "showid" + (this.allChatLog.length - 1);
       }
     });
-    socketObj.on("message", (data) => {
+    socketObj.on("onMessage", (data) => {
       this.allChatLog.push(data.msgData);
       this.showid = "showid" + (this.allChatLog.length - 1);
     });
@@ -81,18 +82,19 @@ export default {
         this.userInfo.openid === this.orderInfo.openid
           ? this.orderInfo.runnerOpenid
           : this.orderInfo.openid;
+      let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
       this.socketObj.emit("sendMessage", {
         toopenid,
         msgData: {
           text: this.msgType === "text" ? this.inputValue : this.mediaUrl,
-          orderid: this.orderInfo.id,
+          orderid,
           msgType: this.msgType,
           fromOpenid: this.userInfo.openid,
         },
       });
       this.allChatLog.push({
         text: this.msgType === "text" ? this.inputValue : this.mediaUrl,
-        orderid: this.orderInfo.id,
+        orderid,
         msgType: this.msgType,
         fromOpenid: this.userInfo.openid,
       });
