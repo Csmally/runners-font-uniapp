@@ -4,7 +4,7 @@ import io from "@hyoga/uni-socket.io";
 import { getOpenid } from "@/utils/login.js";
 export default {
   onLaunch: async function () {
-    const host = import.meta.env.VITE_SOCKET
+    const host = import.meta.env.VITE_SOCKET;
     let openid = await getOpenid();
     const socket = io(host, {
       query: {},
@@ -17,16 +17,11 @@ export default {
       // 连接建立后，本插件的功能已完成，接下来的操作参考socket.io官方客户端文档即可
       // socket.io 唯一连接id，可以监控这个id实现点对点通讯
       const { id } = socket;
-      console.log("connect双协议", socket);
       socket.emit("userData", { openid, socketid: socket.id, type: "1" });
       getApp().globalData.socketObj = socket;
     });
     socket.on("connect_error", () => {
       console.log("connect_error", socket);
-    });
-    //连接断开了
-    socket.on("disconnect", () => {
-      console.log("disconnect", socket);
     });
     //重连中
     socket.io.on("reconnect_attempt", () => {
