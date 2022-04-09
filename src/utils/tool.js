@@ -146,6 +146,7 @@ export function setUpMenuInfo() {
                 allHeight: allHeight
             }
             uni.setStorageSync('menuInfo', menuInfo)
+            uni.setStorageSync('systemInfo', result)
         },
         fail: (error) => {
             console.log(error)

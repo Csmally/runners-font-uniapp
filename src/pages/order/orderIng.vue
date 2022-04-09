@@ -9,7 +9,12 @@
           <view v-else>{{item.nickName}}</view>
         </view>
         <view class="chatinfo hiddenText">
-          加钱加钱加钱加加钱加钱加钱加加钱加钱加钱加加钱加钱加钱加加钱加钱加钱加加钱加钱加钱加
+          <view v-if="item.lastChat">
+            <text v-if="item.lastChat.msgType==='text'">{{item.lastChat.text}}</text>
+            <text v-if="item.lastChat.msgType==='voice'">[语音]</text>
+            <text v-if="item.lastChat.msgType==='image'">[图片]</text>
+            <text v-if="item.lastChat.msgType==='video'">[视频]</text>
+          </view>
         </view>
       </view>
       <view class="goods">
@@ -52,8 +57,8 @@ export default {
   },
   methods: {
     selectChat(item) {
-      jumpTo("/pages/chatRoom/index",item);
-    }
+      jumpTo("/pages/chatRoom/index", item);
+    },
   },
 };
 </script>
@@ -68,9 +73,9 @@ export default {
   border-bottom: 1px solid #f8f8f8;
   display: flex;
   .avatar {
-    width: 140rpx;
-    height: 140rpx;
-    border-radius: 20rpx;
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 12rpx;
   }
   .nameandinfo {
     flex-grow: 2;
@@ -79,14 +84,15 @@ export default {
     justify-content: space-between;
     margin-left: 25rpx;
     .nickname {
-      margin-top: 10rpx;
-      font-size: 35rpx;
+      margin-top: 5rpx;
+      font-size: 33rpx;
       font-weight: 500;
     }
     .chatinfo {
       color: #a09d9d;
-      margin-bottom: 10rpx;
+      margin-bottom: 5rpx;
       width: 350rpx;
+      font-size: 30rpx;
     }
   }
   .goods {
@@ -94,14 +100,14 @@ export default {
     flex-direction: column;
     justify-content: space-between;
     .goodsname {
-      margin-top: 10rpx;
+      margin-top: 5rpx;
       color: #a09d9d;
       margin-top: 10rpx;
     }
     .ordertype {
       width: 38rpx;
       height: 38rpx;
-      margin-bottom: 10rpx;
+      margin-bottom: 5rpx;
     }
   }
 }

@@ -61,7 +61,7 @@
                 <view> * * * * * * </view>
               </view>
             </view>
-            <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" />
+            <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" @click.stop="previewImage(item.photos)" />
           </view>
           <view class="itemBottom">
 
@@ -124,7 +124,6 @@ export default {
       }
     },
     changeCampus() {
-      console.log("9898咋没有了", this.campuses);
       if (this.userInfo.type === "1") {
         for (const item of this.campuses) {
           if (this.userInfo.campus === item.code) {
@@ -161,6 +160,9 @@ export default {
         };
         this.$refs.toast.show(options);
       }
+    },
+    previewImage(src) {
+      uni.previewImage({ urls: [src], indicator: "none" });
     },
   },
 };

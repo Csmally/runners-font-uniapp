@@ -63,7 +63,7 @@
               <view>* * * * * *</view>
             </view>
             <view class="itemcontent" v-if="orderInfo.photos">
-              <image class="desimg" :src="orderInfo.photos" mode="widthFix" />
+              <image class="desimg" :src="orderInfo.photos" mode="widthFix" @click="previewImage(orderInfo.photos)"/>
             </view>
           </view>
         </view>
@@ -167,6 +167,9 @@ export default {
         this.$refs.toast.show(options);
         this.isPopupShow = false;
       }
+    },
+    previewImage(src) {
+      uni.previewImage({ urls: [src], indicator: "none" });
     },
   },
 };

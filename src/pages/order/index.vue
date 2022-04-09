@@ -64,7 +64,32 @@ export default {
           ],
         },
       });
-      this.orderIngData = resData.data
+      if (resData.data.length > 0) {
+        let searchParam = [];
+        for (const item of resData.data) {
+          searchParam.push({ orderid: item.campus + "-" + item.id });
+        }
+        let chatInfo = await uniRequest("chatLogs/search", "post", {
+          param: {
+            $or: searchParam,
+          },
+        });
+        for (const item of resData.data) {
+          for (const item1 of chatInfo.data) {
+            if (item.campus + "-" + item.id === item1.orderid) {
+              if (JSON.parse(item1.content).length > 0) {
+                item.lastChat = JSON.parse(item1.content)[
+                  JSON.parse(item1.content).length - 1
+                ];
+              } else {
+                item.lastChat = null;
+              }
+              break;
+            }
+          }
+        }
+      }
+      this.orderIngData = resData.data;
     },
     async getOrderEdData() {
       let resData = await uniRequest("order/search", "post", {
