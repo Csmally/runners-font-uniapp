@@ -25,7 +25,6 @@ export function uploadFile(data) {
                 folder: data.folder ? data.folder : ""
             },
             success(res) {
-                console.log('9898upres', res)
                 resolve(JSON.parse(res.data).data.Location.replace(
                     "runners-1307290574.cos.ap-beijing.myqcloud.com",
                     "https://static.runners.ink"
@@ -38,7 +37,76 @@ export function uploadFile(data) {
         });
     })
 }
-
+function pushLoacalChatLog(orderid, type, ctx, item, loaclPath, randomId) {
+    ctx.allChatLog.push({
+        randomId: type === "video" ? randomId : null,
+        text: loaclPath,
+        orderid,
+        msgType: type,
+        fromOpenid: ctx.userInfo.openid,
+        style:
+            type === "video"
+                ? { width: item.width, height: item.height }
+                : null,
+    });
+    ctx.showid = "showid" + (ctx.allChatLog.length - 1);
+    if (type === "video") {
+        ctx.loadingMap.set(loaclPath, true);
+    }
+}
+function socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath) {
+    ctx.socketObj.emit("sendMessage", {
+        toopenid:
+            ctx.userInfo.openid === ctx.orderInfo.openid
+                ? ctx.orderInfo.runnerOpenid
+                : ctx.orderInfo.openid,
+        msgData: {
+            text: cdnPath,
+            videoCdnPath: type === "video" ? videoCdnPath : null,
+            orderid,
+            msgType: type,
+            fromOpenid: ctx.userInfo.openid,
+            style:
+                type === "video"
+                    ? { width: item.width, height: item.height }
+                    : null,
+        },
+    });
+}
+export function chatSendFiles(files, ctx, orderid) {
+    let type = files.type
+    for (const item of files.tempFiles) {
+        uni.saveFile({
+            tempFilePath: type === "video" ? item.thumbTempFilePath : item.tempFilePath,
+            success: (res) => {
+                let randomId = getRandomId()
+                pushLoacalChatLog(orderid, type, ctx, item, res.savedFilePath, randomId)
+                uploadFile({
+                    filePath: res.savedFilePath,
+                    folder: "chatLogMedia/",
+                }).then(cdnPath => {
+                    if (type === "video") {
+                        uploadFile({
+                            filePath: item.tempFilePath,
+                            folder: "chatLogMedia/",
+                        }).then(videoCdnPath => {
+                            socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath)
+                            for (const videoChat of ctx.allChatLog) {
+                                if (videoChat.randomId && videoChat.randomId === randomId) {
+                                    videoChat.videoCdnPath = videoCdnPath
+                                    break
+                                }
+                            }
+                            ctx.loadingMap.delete(res.savedFilePath);
+                        })
+                    } else {
+                        socketSendFiles(ctx, cdnPath, orderid, type, item)
+                    }
+                })
+            },
+        });
+    }
+}
 export function downloadFile(data) {
     return new Promise((resolve, reject) => {
         uni.downloadFile({
@@ -101,10 +169,12 @@ export function jumpTo(url, param) {
         });
     }
 }
-
+export function getRandomId() {
+    return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).toString().substr(0, 8)
+}
 export function getFileName(suffix) {
     if (suffix) {
-        return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).substr(0, 8) + '.' + suffix
+        return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).toString().substr(0, 8) + '.' + suffix
     } else {
         return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).toString().substr(0, 8) + '.png'
     }

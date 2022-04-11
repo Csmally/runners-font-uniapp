@@ -17,22 +17,28 @@
             </view>
           </view>
           <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
-          <video :id="'video'+index" :style="getVideoStyle(item.style)" class="chatVideo" v-if="item.msgType==='video'" object-fit="fill" :src="item.text" :show-center-play-btn="!videoLoadingMap.get(item.text)" @play="playVideo(index)" @fullscreenchange="fullscreenchange" play-btn-position="center" :vslide-gesture-in-fullscreen="false" :show-progress="false" :show-fullscreen-btn="false">
-            <cover-view class="covervideo" v-if="videoLoadingMap.get(item.text)">
-              <cover-image class="videoloading" src="@/static/loading.png" />
-            </cover-view>
-          </video>
+
+          <view v-if="item.msgType==='video'" class="videobox">
+            <image class="chatVideo-r" :style="getVideoStyle(item.style)" :src="item.text" />
+            <image v-if="loadingMap.get(item.text)" class="videoloading-r" src="@/static/loading.png" />
+            <image v-if="!loadingMap.get(item.text)" class="playvideo-r" src="@/static/playVideo.png" @click="lookVideo(item)" />
+          </view>
+
         </view>
         <view class="chatleft" v-else>
           <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
-          <view class="textleft">
+          <view v-if="item.msgType==='text'" class="textleft">
             <view class="speakleft"></view>
             <view class="chatcontent">
-              <view v-if="item.msgType==='text'">{{item.text}}</view>
+              <view>{{item.text}}</view>
             </view>
           </view>
           <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
-          <video :id="'video'+index" class="chatVideo" v-if="item.msgType==='video'" :src="item.text" @play="playVideo(index)" play-btn-position="center" :vslide-gesture-in-fullscreen="false" :show-progress="false" :show-fullscreen-btn="false" />
+
+          <view v-if="item.msgType==='video'" class="videobox">
+            <image class="chatVideo-l" :style="getVideoStyle(item.style)" :src="item.text" />
+            <image class="playvideo-l" src="@/static/playVideo.png" @click="lookVideo(item)" />
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -45,20 +51,18 @@
         <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
       </view>
     </view>
+    <video class="covervideo" id="videoplayer" autoplay :direction="0" v-show="isFullScreen" :src="videoPath" @fullscreenchange="fullscreenchange" />
   </view>
 </template>
 
 <script>
 import NavBar from "@/components/navBar.vue";
 import navigationBar from "@/components/navigationBar.vue";
-import { uploadFile } from "@/utils/tool.js";
+import { chatSendFiles } from "@/utils/tool.js";
 export default {
   components: { navigationBar, NavBar },
   onLoad(option) {
     this.orderInfo = option;
-  },
-  onShow() {
-    console.log("9898showle");
     this.userInfo = uni.getStorageSync("userInfo");
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
@@ -77,6 +81,8 @@ export default {
   },
   data() {
     return {
+      isFullScreen: false,
+      videoPath: null,
       userInfo: null,
       orderInfo: null,
       socketObj: null,
@@ -86,19 +92,10 @@ export default {
       statusBarHeight: uni.getStorageSync("menuInfo").statusBarHeight,
       showid: null,
       systemInfo: uni.getStorageSync("systemInfo"),
-      videoLoadingMap: new Map(),
+      loadingMap: new Map(),
     };
   },
   methods: {
-    dianji() {
-      let test = [5, 2, 1, 8, 3];
-      for (const item of test) {
-        console.log("9898test前", item);
-        setTimeout(() => {
-          console.log("9898test后", item);
-        }, item * 1000);
-      }
-    },
     senMsg() {
       let toopenid =
         this.userInfo.openid === this.orderInfo.openid
@@ -126,110 +123,13 @@ export default {
     chooseMedia() {
       uni.chooseMedia({
         success: async (res) => {
-          console.log("9898res11", res);
           let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
-          await Promise.all(
-            res.tempFiles.map((item) => {
-              return (async () => {
-                let cdnPath = await uploadFile({
-                  filePath: item.tempFilePath,
-                  folder: "chatLogMedia/",
-                });
-                this.allChatLog.push({
-                  text: cdnPath,
-                  orderid,
-                  msgType: res.type,
-                  fromOpenid: this.userInfo.openid,
-                  style:
-                    res.type === "video"
-                      ? { width: item.width, height: item.height }
-                      : null,
-                });
-                this.showid = "showid" + (this.allChatLog.length - 1);
-                this.socketObj.emit("sendMessage", {
-                  toopenid:
-                    this.userInfo.openid === this.orderInfo.openid
-                      ? this.orderInfo.runnerOpenid
-                      : this.orderInfo.openid,
-                  msgData: {
-                    text: cdnPath,
-                    orderid,
-                    msgType: res.type,
-                    fromOpenid: this.userInfo.openid,
-                    style:
-                      res.type === "video"
-                        ? { width: item.width, height: item.height }
-                        : null,
-                  },
-                });
-                // this.videoLoadingMap.delete(item.tempFilePath);
-                return cdnPath;
-              })();
-            })
-          );
-
-          // for (const item of res.tempFiles) {
-          //   uni.getFileSystemManager().readFile({
-          //     filePath: item.tempFilePath, //选择图片返回的相对路径
-          //     encoding: "base64", //编码格式
-          //     success: (res) => {
-          //       let base64 = "data:image/jpeg;base64," + res.data;
-          //       console.log("9898base64", base64);
-          //       this.allChatLog.push({
-          //         text: base64,
-          //         orderid,
-          //         msgType: res.type,
-          //         fromOpenid: this.userInfo.openid,
-          //         style:
-          //           res.type === "video"
-          //             ? { width: item.width, height: item.height }
-          //             : null,
-          //       });
-          //       this.showid = "showid" + (this.allChatLog.length - 1);
-          //       this.videoLoadingMap.set(item.tempFilePath, true);
-          //     },
-          //   });
-          //   uploadFile({
-          //     filePath: item.tempFilePath,
-          //     folder: "chatLogMedia/",
-          //   }).then((resPath) => {
-          //     this.socketObj.emit("sendMessage", {
-          //       toopenid:
-          //         this.userInfo.openid === this.orderInfo.openid
-          //           ? this.orderInfo.runnerOpenid
-          //           : this.orderInfo.openid,
-          //       msgData: {
-          //         text: resPath,
-          //         orderid,
-          //         msgType: res.type,
-          //         fromOpenid: this.userInfo.openid,
-          //         style:
-          //           res.type === "video"
-          //             ? { width: item.width, height: item.height }
-          //             : null,
-          //       },
-          //     });
-          //     this.videoLoadingMap.delete(item.tempFilePath);
-          //   });
-          // }
+          chatSendFiles(res, this, orderid);
         },
       });
     },
-    playVideo(index) {
-      this.videoContext = uni.createVideoContext("video" + index);
-      // 进入全屏状态
-      this.videoContext.requestFullScreen();
-    },
-    exitFullScreen(index) {
-      this.videoContext = uni.createVideoContext("video" + index);
-      // 进入全屏状态
-      this.videoContext.exitFullScreen();
-    },
     previewImage(src) {
       uni.previewImage({ urls: [src], indicator: "none" });
-    },
-    fullscreenchange(val) {
-      console.log("9898", val);
     },
     getVideoStyle(style) {
       if (style) {
@@ -256,12 +156,67 @@ export default {
         }
       }
     },
+    lookVideo(item) {
+      this.isFullScreen = true;
+      this.videoPath = item.videoCdnPath;
+      // return
+      let videoContext = uni.createVideoContext("videoplayer", this);
+      // 进入全屏状态
+      videoContext.requestFullScreen();
+    },
+    fullscreenchange(event) {
+      let videoContext = uni.createVideoContext("videoplayer", this);
+      if (event.detail.fullScreen === true) {
+        videoContext.play();
+      } else {
+        videoContext.stop();
+        this.isFullScreen = false
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss">
+.covervideo {
+  position: absolute;
+}
+.videobox {
+  position: relative;
+  box-sizing: content-box;
+  .chatVideo-r {
+    margin-right: 30rpx;
+    border-radius: 15rpx;
+  }
+  .videoloading-r {
+    position: absolute;
+    top: calc(50% - 42rpx);
+    left: calc(50% - 45rpx);
+    width: 60rpx;
+    height: 60rpx;
+    animation: videoloading 1s linear infinite;
+  }
+  .playvideo-r {
+    position: absolute;
+    top: calc(50% - 42rpx);
+    left: calc(50% - 45rpx);
+    width: 60rpx;
+    height: 60rpx;
+  }
+  .chatVideo-l {
+    margin-left: 30rpx;
+    border-radius: 15rpx;
+  }
+  .playvideo-l {
+    position: absolute;
+    top: calc(50% - 42rpx);
+    left: calc(50% - 15rpx);
+    width: 60rpx;
+    height: 60rpx;
+  }
+}
 .container {
+  position: relative;
   height: 100vh;
 }
 .chattitle {
@@ -274,18 +229,6 @@ export default {
     text-align: center;
     height: 44px;
     line-height: 44px;
-  }
-}
-.covervideo {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .videoloading {
-    width: 60rpx;
-    height: 60rpx;
-    animation: videoloading 1s linear infinite;
   }
 }
 @-webkit-keyframes videoloading {
@@ -346,10 +289,6 @@ export default {
         height: 350rpx;
         border-radius: 15rpx;
         margin-right: 30rpx;
-      }
-      .chatVideo {
-        margin-right: 30rpx;
-        border-radius: 15rpx;
       }
     }
     .chatleft {
