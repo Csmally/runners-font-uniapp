@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <view v-for="item in orderIngData" :key="item.id" class="chatitem" @click="selectChat(item)">
+    <view v-for="item in orderData" :key="item.id" class="chatitem" @click="selectChat(item)">
       <image v-if="userInfo.openid===item.openid" class="avatar" :src="item.runnerAvatarUrl" />
       <image v-else class="avatar" :src="item.avatarUrl" />
       <view class="nameandinfo">
@@ -38,7 +38,7 @@ export default {
       type: Object,
       default: null,
     },
-    orderIngData: {
+    orderData: {
       type: Array,
       default: [],
     },
@@ -65,7 +65,7 @@ export default {
 
 <style lang="scss">
 .container {
-  height: 100vh;
+  height: 88vh;
   overflow: auto;
 }
 .chatitem {

@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    完成的
+    我发出的
     <button @click="dianji">点击</button>
   </view>
 </template>
@@ -11,14 +11,16 @@ export default {
     orderData: {
       type: Array,
       default: [],
-    }
+    },
   },
   data() {
-    return {};
+    return {
+     
+    };
   },
   methods: {
     dianji() {
-      console.log("9898数据222",this.orderData);
+      console.log("9898数据111", this.orderData);
     },
   },
 };
@@ -26,7 +28,7 @@ export default {
 
 <style lang="scss">
 .container {
-  height: 88vh;
+  height: 93vh;
   background-color: #f6f6f6;
 }
 </style>

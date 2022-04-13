@@ -1,7 +1,7 @@
 <template>
   <tui-toast ref="toast" position="center"></tui-toast>
   <fui-loading v-if="submitLoading" text="提交中. . ." :srcCol="commonBase64.loading"></fui-loading>
-  <view v-if="isContentShow">
+  <view class="content" v-if="isContentShow">
     <!-- 商品信息 -->
     <view class="card">
       <tui-card :image="card.goodsInfo.img" :title="card.goodsInfo.title">
@@ -250,6 +250,10 @@ export default {
 </script>
 
 <style lang="scss">
+.content {
+  height: 93vh;
+  overflow: auto;
+}
 .photo {
   padding: 30rpx;
 }

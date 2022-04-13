@@ -63,7 +63,7 @@
               <view>* * * * * *</view>
             </view>
             <view class="itemcontent" v-if="orderInfo.photos">
-              <image class="desimg" :src="orderInfo.photos" mode="widthFix" @click="previewImage(orderInfo.photos)"/>
+              <image class="desimg" :src="orderInfo.photos" mode="widthFix" @click="previewImage(orderInfo.photos)" />
             </view>
           </view>
         </view>
@@ -138,7 +138,7 @@ export default {
     async okPopup() {
       let resData = await uniRequest("order/update", "post", {
         dbTable: this.orderInfo.campus,
-        searchParams: { id: this.orderInfo.id },
+        searchParams: { id: this.orderInfo.id, status: "1" },
         updateParams: {
           runnerAvatarUrl: this.userInfo.avatarUrl,
           runnerGender: this.userInfo.gender,
@@ -147,7 +147,7 @@ export default {
           status: "2",
         },
       });
-      if (resData.code === "1") {
+      if (resData.code === 1) {
         let searData = await uniRequest("order/search", "post", {
           dbTable: this.orderInfo.campus,
           param: { id: this.orderInfo.id },

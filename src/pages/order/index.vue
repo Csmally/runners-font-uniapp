@@ -1,15 +1,23 @@
 <template>
-  <view class="order" :style="`background-image:url(${orderBase64.backgroundImg})`">
-    <div class="segmentedControl">
-      <fui-segmented-control :values="values" type="text" bold color="#a3a2a2" activeColor="#000000" :current="currentPage" @click="changeTab"></fui-segmented-control>
-    </div>
+  <!-- <view class="order" :style="`background-image:url(${orderBase64.backgroundImg})`"> -->
+  <view class="order">
     <view v-if="userInfo&&userInfo.type==='2'">
       <Tourist />
     </view>
     <view v-if="userInfo&&userInfo.type==='1'">
-      <NewOrder v-show="currentPage===0" :userInfo="userInfo" />
-      <OrderIng v-show="currentPage===1" :userInfo="userInfo" :orderIngData="orderIngData" />
-      <OrderEd v-show="currentPage===2" :userInfo="userInfo" :orderEdData="orderEdData" />
+      <SegmentedControl :texts="texts" @tabChange="tabChange" :currentTab="currentTab" />
+      <view class="typechange" v-if="currentTab===1||currentTab===3">
+        <view class="box" @click="changeType">
+          <image :class="isChanging?'typechangeing':'loadingimg'" src="@/static/loadingSearch.png" />
+          <view class="typetext">{{typeText[typeIndex]}}</view>
+        </view>
+      </view>
+      <view>
+        <NewOrder v-if="currentTab===0" :userInfo="userInfo" />
+        <OrderIng v-if="currentTab===1" :userInfo="userInfo" :orderData="orderData" />
+        <Isend v-if="currentTab===2" :userInfo="userInfo" :orderData="orderData" />
+        <OrderEd v-if="currentTab===3" :userInfo="userInfo" :orderData="orderData" />
+      </view>
     </view>
   </view>
 </template>
@@ -17,54 +25,87 @@
 <script>
 import { uniRequest } from "@/utils/tool.js";
 import NewOrder from "./newOrder.vue";
+import Isend from "./isend.vue";
 import OrderIng from "./orderIng.vue";
 import OrderEd from "./orderEd.vue";
 import Tourist from "./tourist.vue";
 import { orderBase64 } from "@/base64/index.js";
+import SegmentedControl from "@/components/segmentedControl.vue";
 export default {
-  components: { NewOrder, OrderIng, OrderEd, Tourist },
+  components: { NewOrder, OrderIng, OrderEd, Tourist, SegmentedControl, Isend },
   data() {
     return {
       orderBase64,
-      currentPage: 1,
-      values: ["New", "进行中", "已完成"],
+      currentTab: 1,
+      texts: ["去下单", "进行中", "我发出", "已完成"],
       userInfo: null,
-      orderIngData: [],
-      orderEdData: []
+      orderData: [],
+      typeIndex: 0,
+      typeText: ["全部", "我发出的", "我接收的"],
+      isChanging: false,
     };
   },
   onLoad() {},
   onShow() {
+    this.currentTab = 1;
+    this.typeIndex = 0;
     this.userInfo = uni.getStorageSync("userInfo");
-    if (this.currentPage === 1) {
-      this.getOrderIngData();
-    }
-    if (this.currentPage === 2) {
-      this.getOrderEdData();
+    if (this.currentTab !== 0) {
+      this.getOrderData();
     }
   },
   methods: {
-    async changeTab(value) {
-      this.currentPage = value.index;
-      if (value.index === 1) {
-        await this.getOrderIngData();
-      }
-      if (value.index === 2) {
-        await this.getOrderEdData();
+    async tabChange(value) {
+      this.currentTab = value;
+      if (value !== 0) {
+        await this.getOrderData();
       }
     },
-    async getOrderIngData() {
+    changeType() {
+      this.isChanging = true;
+      if (this.typeIndex === 2) {
+        this.typeIndex = 0;
+      } else {
+        this.typeIndex++;
+      }
+      this.getOrderData();
+    },
+    async getOrderData() {
+      let param;
+      if (this.currentTab === 1 || this.currentTab === 3) {
+        if (this.typeIndex == 0) {
+          param = {
+            status: this.currentTab === 1 ? 2 : 3,
+            $or: [
+              { openid: this.userInfo.openid },
+              { runnerOpenid: this.userInfo.openid },
+            ],
+          };
+        }
+        if (this.typeIndex == 1) {
+          param = {
+            status: this.currentTab === 1 ? 2 : 3,
+            openid: this.userInfo.openid,
+          };
+        }
+        if (this.typeIndex == 2) {
+          param = {
+            status: this.currentTab === 1 ? 2 : 3,
+            runnerOpenid: this.userInfo.openid,
+          };
+        }
+      }
+      if (this.currentTab === 2) {
+        param = {
+          status: 1,
+          openid: this.userInfo.openid,
+        };
+      }
       let resData = await uniRequest("order/search", "post", {
         dbTable: this.userInfo.campus,
-        param: {
-          status: 2,
-          $or: [
-            { openid: this.userInfo.openid },
-            { runnerOpenid: this.userInfo.openid },
-          ],
-        },
+        param,
       });
-      if (resData.data.length > 0) {
+      if (resData.data.length > 0 && this.currentTab === 1) {
         let searchParam = [];
         for (const item of resData.data) {
           searchParam.push({ orderid: item.campus + "-" + item.id });
@@ -89,20 +130,8 @@ export default {
           }
         }
       }
-      this.orderIngData = resData.data;
-    },
-    async getOrderEdData() {
-      let resData = await uniRequest("order/search", "post", {
-        dbTable: this.userInfo.campus,
-        param: {
-          status: 3,
-          $or: [
-            { openid: this.userInfo.openid },
-            { runnerOpenid: this.userInfo.openid },
-          ],
-        },
-      });
-      this.orderEdData = resData.data
+      this.orderData = resData.data;
+      this.isChanging = false;
     },
   },
 };
@@ -115,11 +144,43 @@ export default {
   background-position: center;
   background-size: contain;
 }
-.segmentedControl {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  background-color: #ffffff;
-  z-index: 999;
+.typechange {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  .box {
+    display: flex;
+    align-items: center;
+    height: 5vh;
+    .typetext {
+      color: #a09d9d;
+      margin: 0 30rpx 0 20rpx;
+    }
+    .loadingimg {
+      width: 40rpx;
+      height: 40rpx;
+    }
+    .typechangeing {
+      width: 40rpx;
+      height: 40rpx;
+      animation: loading 1s linear infinite;
+    }
+  }
+}
+@-webkit-keyframes loading {
+  0% {
+    -webkit-transform: rotate(0);
+    -moz-transform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -39,7 +39,8 @@
       <image class="backgroundImage" src="@/static/test5.jpg" mode="scaleToFill" />
     </view>
     <view class="content">
-      <ContentInfo />
+      <!-- <ContentInfo /> -->
+      <SegmentedControl :texts="texts" @tabChange="tabChange" :currentTab="currentTab"/>
     </view>
     <!-- 底部弹出 -->
     <tui-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="isPopupShow" @close="closePopup">
@@ -52,15 +53,17 @@
 </template>
 
 <script>
-import ContentInfo from "./contentInfo.vue";
+import SegmentedControl from "@/components/segmentedControl.vue";
 import { jumpTo } from "@/utils/tool.js";
 export default {
-  components: { ContentInfo },
+  components: { SegmentedControl },
   data() {
     return {
       allHeight: null,
       userInfo: null,
       isPopupShow: false,
+      texts: ["关注", "赞赏", "模版", "地址"],
+      currentTab: 0
     };
   },
   onLoad() {},
@@ -80,6 +83,9 @@ export default {
     editInfo() {
       jumpTo("/pages/self/editInfo");
     },
+    tabChange(value) {
+      this.currentTab = value
+    }
   },
 };
 </script>
