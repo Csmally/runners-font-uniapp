@@ -67,20 +67,20 @@
 import { uniRequest, jumpTo, wxPay, uploadFile } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64, orderBase64 } from "@/base64/index.js";
 export default {
+  props: {
+    userInfo: {
+      type: Object,
+      default: null,
+    },
+  },
   onInit() {},
   onLoad() {},
-  onShow() {
-    this.userInfo = uni.getStorageSync("userInfo");
-  },
-  onReady() {
-    
-  },
+  onReady() {},
   data() {
     return {
       orderBase64,
       addCampusBase64,
       commonBase64,
-      userInfo: null,
       form: {
         goodsName: null,
         goodsAddress: null,
@@ -225,6 +225,7 @@ export default {
       await uniRequest("order/add", "post", {
         ...this.form,
         photos: cloudPhotoPath,
+        goodsPrice: Number(this.form.goodsPrice).toFixed(2),
         price: Number(this.form.price).toFixed(2),
         openid: this.userInfo.openid,
         dbTable: this.userInfo.campus,

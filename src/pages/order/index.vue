@@ -13,10 +13,10 @@
         </view>
       </view>
       <view>
-        <NewOrder v-if="currentTab===0" :userInfo="userInfo" />
-        <OrderIng v-if="currentTab===1" :userInfo="userInfo" :orderData="orderData" />
-        <Isend v-if="currentTab===2" :userInfo="userInfo" :orderData="orderData" />
-        <OrderEd v-if="currentTab===3" :userInfo="userInfo" :orderData="orderData" />
+        <NewOrder v-show="currentTab===0" :userInfo="userInfo" />
+        <OrderIng v-show="currentTab===1" :userInfo="userInfo" :orderData="orderData" />
+        <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderData" />
+        <OrderEd v-show="currentTab===3" :userInfo="userInfo" :orderData="orderData" />
       </view>
     </view>
   </view>
@@ -25,14 +25,21 @@
 <script>
 import { uniRequest } from "@/utils/tool.js";
 import NewOrder from "./newOrder.vue";
-import Isend from "./isend.vue";
+import OrderSelf from "./orderSelf.vue";
 import OrderIng from "./orderIng.vue";
 import OrderEd from "./orderEd.vue";
 import Tourist from "./tourist.vue";
 import { orderBase64 } from "@/base64/index.js";
 import SegmentedControl from "@/components/segmentedControl.vue";
 export default {
-  components: { NewOrder, OrderIng, OrderEd, Tourist, SegmentedControl, Isend },
+  components: {
+    NewOrder,
+    OrderIng,
+    OrderEd,
+    Tourist,
+    SegmentedControl,
+    OrderSelf,
+  },
   data() {
     return {
       orderBase64,
@@ -47,8 +54,6 @@ export default {
   },
   onLoad() {},
   onShow() {
-    this.currentTab = 1;
-    this.typeIndex = 0;
     this.userInfo = uni.getStorageSync("userInfo");
     if (this.currentTab !== 0) {
       this.getOrderData();
@@ -72,10 +77,10 @@ export default {
     },
     async getOrderData() {
       let param;
-      if (this.currentTab === 1 || this.currentTab === 3) {
+      if (this.currentTab === 1) {
         if (this.typeIndex == 0) {
           param = {
-            status: this.currentTab === 1 ? 2 : 3,
+            status: 2,
             $or: [
               { openid: this.userInfo.openid },
               { runnerOpenid: this.userInfo.openid },
@@ -84,13 +89,13 @@ export default {
         }
         if (this.typeIndex == 1) {
           param = {
-            status: this.currentTab === 1 ? 2 : 3,
+            status: 2,
             openid: this.userInfo.openid,
           };
         }
         if (this.typeIndex == 2) {
           param = {
-            status: this.currentTab === 1 ? 2 : 3,
+            status: 2,
             runnerOpenid: this.userInfo.openid,
           };
         }
@@ -100,6 +105,35 @@ export default {
           status: 1,
           openid: this.userInfo.openid,
         };
+      }
+      if (this.currentTab === 3) {
+        if (this.typeIndex == 0) {
+          param = {
+            status: {
+              $or: [3, 4],
+            },
+            $or: [
+              { openid: this.userInfo.openid },
+              { runnerOpenid: this.userInfo.openid },
+            ],
+          };
+        }
+        if (this.typeIndex == 1) {
+          param = {
+            status: {
+              $or: [3, 4],
+            },
+            openid: this.userInfo.openid,
+          };
+        }
+        if (this.typeIndex == 2) {
+          param = {
+            status: {
+              $or: [3, 4],
+            },
+            runnerOpenid: this.userInfo.openid,
+          };
+        }
       }
       let resData = await uniRequest("order/search", "post", {
         dbTable: this.userInfo.campus,
