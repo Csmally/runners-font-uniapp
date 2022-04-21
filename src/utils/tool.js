@@ -15,6 +15,20 @@ export function uniRequest(url, method, data) {
     })
 }
 
+export function pushMessage() {
+    uni.request({
+        url: "https://api.weixin.qq.com/cgi-bin/message/subscribe/send",
+        method: 'POST',
+        data: data ? data : {},
+        success: (res) => {
+            resolve(res.data)
+        },
+        fail: (error) => {
+            reject(error)
+        }
+    })
+}
+
 export function uploadFile(data) {
     return new Promise((resolve, reject) => {
         uni.uploadFile({

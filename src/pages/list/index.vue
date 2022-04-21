@@ -1,80 +1,111 @@
 <template>
   <tui-toast ref="toast" position="center"></tui-toast>
-  <scroll-view class="myScrollView" refresher-default-style="none" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
-    <template slot="refresher">
-      <RefreshLoading />
-    </template>
-    <view>
-      <!-- 轮播图 -->
-      <!-- 轮播图指示器颜色 indicator-color="#d5eef5" indicator-active-color="#81ccf5" -->
-      <swiper class="card-swiper" previous-margin="70rpx" next-margin="70rpx" :circular="true" :autoplay="true" :indicator-dots="true" :interval="3000" :current="cardCur" :duration="500" @change="swiperChange">
-        <swiper-item v-for="(item,index) in list" :key="index" :class="cardCur==index ? 'cur' : ''">
-          <image :src="item" class="swiper-item swiperVip shadow-blur" />
-          <!-- <view class="swiper-item swiperVip shadow-blur">
+  <button @click="dianji">测试</button>
+  <!-- 主list页面 -->
+  <uni-transition mode-class="fade" :show="this.userInfo&&listType==='mainList'">
+    <scroll-view class="mainScrollView" refresher-default-style="none" enable-back-to-top lower-threshold="0" @scrolltolower="scrolltolower" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
+      <template slot="refresher">
+        <RefreshLoading />
+      </template>
+      <view>
+        <!-- 轮播图 -->
+        <!-- 轮播图指示器颜色 indicator-color="#d5eef5" indicator-active-color="#81ccf5" -->
+        <swiper class="card-swiper" previous-margin="70rpx" next-margin="70rpx" :circular="true" :autoplay="true" :indicator-dots="true" :interval="3000" :current="cardCur" :duration="500" @change="swiperChange">
+          <swiper-item v-for="(item,index) in list" :key="index" :class="cardCur==index ? 'cur' : ''">
+            <image :src="item" class="swiper-item swiperVip shadow-blur" />
+            <!-- <view class="swiper-item swiperVip shadow-blur">
           </view> -->
-        </swiper-item>
-      </swiper>
-      <!-- 搜索框 -->
-      <view class="search">
-        <view class="searchText hiddenText" @click="changeDropdownShow">{{userCampus}}</view>
-        <text style="font-weight: bold">></text>
-        <view class="searchInput">
-          <input placeholder="搜索" confirm-type="search" />
+          </swiper-item>
+        </swiper>
+        <!-- 搜索框 -->
+        <view class="search">
+          <view class="searchText hiddenText" @click="changeDropdownShow">{{userCampus}}</view>
+          <text style="font-weight: bold">></text>
+          <view class="searchInput" @click="toSearchList">
+            <input placeholder="搜索" confirm-type="search" disabled />
+          </view>
         </view>
-      </view>
-      <view class="list">
-        <view class="listItem" v-for="(item,index) in data" :key="index" @click="selectItem(item)">
-          <view class="itemTop">
-            <view class="topLeft">
-              <view class="avatar">
-                <image class="avatarImg" :src="item.avatarUrl" mode="aspectFit" />
-                <image v-if="item.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
-                <image v-if="item.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
+        <view class="list">
+          <view class="listItem" v-for="(item,index) in data" :key="index" @click="selectItem(item)">
+            <view class="itemTop">
+              <view class="topLeft">
+                <view class="avatar">
+                  <image class="avatarImg" :src="item.avatarUrl" mode="aspectFit" />
+                  <image v-if="item.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
+                  <image v-if="item.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
+                </view>
+                <view class="nickName">{{item.nickName}}</view>
               </view>
-              <view class="nickName">{{item.nickName}}</view>
-            </view>
-            <view class="topRight">
-              <view class="followin">关注</view>
-              <view class="more">
-                <view></view>
-                <view></view>
-                <view></view>
-              </view>
-            </view>
-          </view>
-          <view class="itemMiddle">
-            <view class="middleMainInfo">
-              <view class="mainInfo">
-                <image src="@/static/goods.png" mode="aspectFit" />
-                <view>{{item.goodsName}}</view>
-              </view>
-              <view class="mainInfo">
-                <image src="@/static/store.png" mode="aspectFit" />
-                <view>{{item.goodsAddress}}</view>
-              </view>
-              <view class="mainInfo">
-                <image src="@/static/wallet.png" mode="aspectFit" />
-                <view>{{item.price}}元</view>
-              </view>
-              <view v-if="item.desc" class="mainInfo">
-                <image src="@/static/chat.png" mode="aspectFit" />
-                <view> * * * * * * </view>
+              <view class="topRight">
+                <view class="followin">关注</view>
+                <view class="more">
+                  <view></view>
+                  <view></view>
+                  <view></view>
+                </view>
               </view>
             </view>
-            <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" @click.stop="previewImage(item.photos)" />
-          </view>
-          <view class="itemBottom">
+            <view class="itemMiddle">
+              <view class="middleMainInfo">
+                <view class="mainInfo">
+                  <image src="@/static/goods.png" mode="aspectFit" />
+                  <view class="hiddenText">{{item.goodsName}}</view>
+                </view>
+                <view class="mainInfo">
+                  <image src="@/static/store.png" mode="aspectFit" />
+                  <view class="hiddenText">{{item.goodsAddress}}</view>
+                </view>
+                <view class="mainInfo">
+                  <image src="@/static/wallet.png" mode="aspectFit" />
+                  <view>{{item.price}}元</view>
+                </view>
+                <view v-if="item.desc" class="mainInfo">
+                  <image src="@/static/chat.png" mode="aspectFit" />
+                  <view> * * * * * * </view>
+                </view>
+              </view>
+              <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" @click.stop="previewImage(item.photos)" />
+              <view style="color: #a3a2a2;text-align: right;margin: 15rpx 0">
+                <uni-dateformat :date="item.createdAt" :threshold="[300000, 18000000]"></uni-dateformat>
+              </view>
+            </view>
+            <view class="itemBottom">
 
+            </view>
           </view>
         </view>
       </view>
+      <view class="nosearch" v-if="this.userInfo?.type === '2'">
+        游客模式下暂时无法查看更多
+      </view>
+      <view class="bottomloading" v-show="bottomLoadingShow">
+        <image src="@/static/loadingBottom.png" />
+        <view>
+          正在加载···
+        </view>
+      </view>
+      <view class="nomore" v-show="noMore">
+        没有更多了
+      </view>
+    </scroll-view>
+  </uni-transition>
+  <!-- 搜索list页面 -->
+  <uni-transition mode-class="fade" :show="this.userInfo&&listType==='searchList'">
+    <view class="searchbar">
+      <uni-search-bar @confirm="searchConfirm" @cancel="searchCancel" v-model="searchValue" :focus="searchFocus"></uni-search-bar>
     </view>
-  </scroll-view>
+    <scroll-view class="searchScrollView" scroll-y>
+      <button @click="testSearch">查询</button>
+      <view>
+        <view class="test" v-for="item in arr" :key="item">test</view>
+      </view>
+    </scroll-view>
+  </uni-transition>
 </template>
 
 <script>
 import RefreshLoading from "@/components/refreshLoading.vue";
-import { uniRequest, jumpTo } from "@/utils/tool.js";
+import { uniRequest, jumpTo, pushMessage } from "@/utils/tool.js";
 export default {
   components: { RefreshLoading },
   data() {
@@ -90,38 +121,96 @@ export default {
       bottomRefresh: false,
       userCampus: null,
       userInfo: null,
+      bottomLoadingShow: false,
+      noMore: false,
+      listType: "mainList",
+      searchValue: "",
+      searchFocus: false,
+      arr: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     };
   },
   onLoad() {},
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
-    console.log("989811show", this.userInfo);
-    await this.getData();
   },
   watch: {
     "userInfo.campus"() {
-      console.log("9898campus变了", this.userInfo.type);
       this.changeCampus();
-      this.getData();
+      this.getData("start");
     },
   },
   methods: {
-    async getData() {
+    async dianji() {
+      uni.requestSubscribeMessage({
+        tmplIds: ["AmMC8GP5S4h_Mnt08OHSQFLkj3T_kaRpATWe-gsRu6k"],
+        success(res) {
+          pushMessage()
+        },
+        fail(err) {
+          console.log("9898订阅失败", err);
+        },
+      });
+      console.log("9898测试", data);
+    },
+    async testSearch() {
+      let data = await uniRequest("order/search", "post", {
+        dbTable: this.userInfo.campus,
+        param: {
+          $or: [
+            {
+              goodsName: {
+                // $like: "%" + this.searchValue + "%",
+                $regexp: "^[可T|GG]",
+              },
+            },
+            {
+              goodsAddress: {
+                // $like: "%" + this.searchValue + "%",
+                $regexp: "^[可T|GG]",
+              },
+            },
+          ],
+        },
+      });
+    },
+    async getData(mark) {
       if (this.userInfo.type === "1") {
         console.log("9898现在是客户模式了", this.userInfo.campus);
         let resData = await uniRequest("order/search", "post", {
           dbTable: this.userInfo.campus,
-          param: { status: 1 },
+          param:
+            mark === "top" && this.data.length > 0
+              ? { status: 1, id: { $gt: this.data[0].id } }
+              : { status: 1 },
+          otherParam:
+            mark === "start"
+              ? { limit: 10 }
+              : mark === "top"
+              ? {}
+              : { limit: 10, offset: this.data.length },
         });
-        this.data = resData.data;
+        if (mark === "start") {
+          this.data = resData.data;
+        }
+        if (mark === "top") {
+          this.data.unshift(...resData.data);
+        }
+        if (mark === "bottom") {
+          this.data.push(...resData.data);
+        }
+        if (resData.data.length === 0) {
+          this.noMore = true;
+        }
       } else {
         console.log("9898游客模式下只显示十条数据");
         let resData = await uniRequest("order/search", "post", {
           dbTable: "beida",
           param: { status: 1 },
+          otherParam: { limit: 10 },
         });
         this.data = resData.data;
       }
+      this.bottomLoadingShow = false;
     },
     changeCampus() {
       if (this.userInfo.type === "1") {
@@ -141,10 +230,18 @@ export default {
     async scrollTop(e) {
       if (this.topRefresh === false) {
         this.topRefresh = true;
-        await this.getData();
+        await this.getData("top");
         this.topRefresh = false;
       } else {
         return;
+      }
+    },
+    async scrolltolower() {
+      if (this.userInfo.type === "2" || this.noMore) {
+        return;
+      } else {
+        this.bottomLoadingShow = true;
+        await this.getData("bottom");
       }
     },
     changeDropdownShow() {
@@ -164,13 +261,38 @@ export default {
     previewImage(src) {
       uni.previewImage({ urls: [src], indicator: "none" });
     },
+    toSearchList() {
+      console.log("9898去搜索了");
+      this.listType = "searchList";
+      setTimeout(() => {
+        this.searchFocus = true;
+      }, 301);
+    },
+    searchConfirm(e) {
+      console.log("9898000", this.searchValue);
+    },
+    searchCancel() {
+      this.listType = "mainList";
+      this.searchFocus = false;
+    },
   },
 };
 </script>
 
 <style lang="scss">
-.myScrollView {
+.mainScrollView {
   height: 100vh;
+}
+.searchScrollView {
+  height: 90vh;
+}
+.searchbar {
+  height: 10vh;
+}
+
+.test {
+  height: 25vh;
+  background-color: violet;
 }
 .card-swiper {
   height: 420rpx !important;
@@ -330,5 +452,50 @@ export default {
 .desimg {
   width: 100%;
   border-radius: 30rpx;
+}
+.nosearch {
+  text-align: center;
+  margin: 10rpx;
+  color: #a3a2a2;
+  height: 50px;
+  line-height: 50rpx;
+}
+.bottomloading {
+  text-align: center;
+  // margin: 10rpx;
+  color: #a3a2a2;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  image {
+    width: 40rpx;
+    height: 40rpx;
+    margin-right: 10rpx;
+    animation: loading 1s linear infinite;
+  }
+}
+@-webkit-keyframes loading {
+  0% {
+    -webkit-transform: rotate(0);
+    -moz-transform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.nomore {
+  text-align: center;
+  margin: 10rpx;
+  color: #a3a2a2;
+  height: 50px;
+  line-height: 50rpx;
 }
 </style>

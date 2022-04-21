@@ -48,7 +48,7 @@ export default {
   },
   async onShow() {
     this.allHeight = uni.getStorageSync("menuInfo").allHeight;
-    let myCampuses = await uniRequest("campus/search", "post");
+    let myCampuses = await uniRequest("campus/search", "POST");
     this.myCampuses = myCampuses.data;
     reSetArr(this.campuses, myCampuses.data);
     let userInfo = uni.getStorageSync("userInfo");
@@ -78,14 +78,14 @@ export default {
     async okPopup() {
       this.currentName = this.popupCurrentName;
       this.currentCode = this.popupCurrentCode;
-      await uniRequest("userInfo/update", "post", {
+      await uniRequest("userInfo/update", "POST", {
         searchParams: { openid: this.userInfo.openid },
         updateParams: {
           campus: this.popupCurrentCode,
           type: "1",
         },
       });
-      let userInfo = await uniRequest("userInfo/search", "post", {
+      let userInfo = await uniRequest("userInfo/search", "POST", {
         openid: this.userInfo.openid,
       });
       console.log("9898修改后", userInfo);
