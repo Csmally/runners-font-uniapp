@@ -57,7 +57,7 @@ export default {
             filePath: this.avatarUrl,
             folder: "userAvatar/",
           });
-          await uniRequest("userInfo/update", "post", {
+          await uniRequest("userInfo/update", "POST", {
             searchParams: { openid: this.userInfo.openid },
             updateParams: {
               avatarUrl: cloudPhotoPath,
@@ -92,14 +92,14 @@ export default {
     },
     async submit() {
       this.submitLoading = true;
-      await uniRequest("userInfo/update", "post", {
+      await uniRequest("userInfo/update", "POST", {
         searchParams: { openid: this.userInfo.openid },
         updateParams: {
           gender: this.userInfo.gender,
           nickName: this.userInfo.nickName,
         },
       });
-      let userData = (await uniRequest("userInfo/search", "post", {
+      let userData = (await uniRequest("userInfo/search", "POST", {
         openid: this.userInfo.openid,
       })).data;
       this.userInfo = userData;

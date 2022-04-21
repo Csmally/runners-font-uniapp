@@ -136,7 +136,7 @@ export default {
       this.isPopupShow = true;
     },
     async okPopup() {
-      let resData = await uniRequest("order/update", "post", {
+      let resData = await uniRequest("order/update", "POST", {
         dbTable: this.orderInfo.campus,
         searchParams: { id: this.orderInfo.id, status: "1" },
         updateParams: {
@@ -148,7 +148,7 @@ export default {
         },
       });
       if (resData.code === 1) {
-        let searData = await uniRequest("order/search", "post", {
+        let searData = await uniRequest("order/search", "POST", {
           dbTable: this.orderInfo.campus,
           param: { id: this.orderInfo.id },
         });

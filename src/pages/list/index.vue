@@ -153,7 +153,7 @@ export default {
       console.log("9898测试", data);
     },
     async testSearch() {
-      let data = await uniRequest("order/search", "post", {
+      let data = await uniRequest("order/search", "POST", {
         dbTable: this.userInfo.campus,
         param: {
           $or: [
@@ -176,7 +176,7 @@ export default {
     async getData(mark) {
       if (this.userInfo.type === "1") {
         console.log("9898现在是客户模式了", this.userInfo.campus);
-        let resData = await uniRequest("order/search", "post", {
+        let resData = await uniRequest("order/search", "POST", {
           dbTable: this.userInfo.campus,
           param:
             mark === "top" && this.data.length > 0
@@ -203,7 +203,7 @@ export default {
         }
       } else {
         console.log("9898游客模式下只显示十条数据");
-        let resData = await uniRequest("order/search", "post", {
+        let resData = await uniRequest("order/search", "POST", {
           dbTable: "beida",
           param: { status: 1 },
           otherParam: { limit: 10 },

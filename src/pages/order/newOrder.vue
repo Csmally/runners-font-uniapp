@@ -222,7 +222,7 @@ export default {
       }
       this.isContentShow = false;
       this.submitLoading = true;
-      await uniRequest("order/add", "post", {
+      await uniRequest("order/add", "POST", {
         ...this.form,
         photos: cloudPhotoPath,
         goodsPrice: Number(this.form.goodsPrice).toFixed(2),

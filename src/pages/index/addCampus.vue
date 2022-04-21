@@ -314,7 +314,7 @@ export default {
       }
       this.isContentShow = false;
       this.submitLoading = true;
-      await uniRequest("campus/suggestion", "post", {
+      await uniRequest("campus/suggestion", "POST", {
         ...this.form,
         openid: this.openid,
       });

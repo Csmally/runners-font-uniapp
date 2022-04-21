@@ -135,7 +135,7 @@ export default {
           };
         }
       }
-      let resData = await uniRequest("order/search", "post", {
+      let resData = await uniRequest("order/search", "POST", {
         dbTable: this.userInfo.campus,
         param,
       });
@@ -144,7 +144,7 @@ export default {
         for (const item of resData.data) {
           searchParam.push({ orderid: item.campus + "-" + item.id });
         }
-        let chatInfo = await uniRequest("chatLogs/search", "post", {
+        let chatInfo = await uniRequest("chatLogs/search", "POST", {
           param: {
             $or: searchParam,
           },

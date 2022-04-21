@@ -3,7 +3,7 @@ export function uniRequest(url, method, data) {
     return new Promise((resolve, reject) => {
         uni.request({
             url: host + '/wx/' + url,
-            method: method ? method : 'get',
+            method: method ? method : 'GET',
             data: data ? data : {},
             success: (res) => {
                 resolve(res.data)

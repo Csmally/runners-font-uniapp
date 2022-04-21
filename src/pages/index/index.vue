@@ -45,7 +45,7 @@ export default {
     };
   },
   async onLoad() {
-    let myCampuses = await uniRequest("campus/search", "post");
+    let myCampuses = await uniRequest("campus/search", "POST");
     reSetArr(this.campuses, myCampuses.data);
   },
   async onShow() {
@@ -53,7 +53,7 @@ export default {
     //获取是否新用户
     let openid = await getOpenid();
     this.openid = openid;
-    let userData = await uniRequest("userInfo/search", "post", { openid });
+    let userData = await uniRequest("userInfo/search", "POST", { openid });
     if (userData.data) {
       //如果是老用户 返回用户信息，并存到本地
       uni.setStorageSync("isFirst", false);
@@ -73,7 +73,7 @@ export default {
       let cloudPhotoPath = null;
       let localFilePath = null;
       if (proInfo) {
-        let resData = await uniRequest("txCos/saveAvatar", "post", {
+        let resData = await uniRequest("txCos/saveAvatar", "POST", {
           folder: "userAvatar/",
           filePath: proInfo.userInfo.avatarUrl,
           fileName: getFileName(),
@@ -92,7 +92,7 @@ export default {
         };
         uni.setStorageSync("userInfo", info);
         uni.setStorageSync("isFirst", true);
-        await uniRequest("userInfo/add", "post", info);
+        await uniRequest("userInfo/add", "POST", info);
         uni.switchTab({
           url: "/pages/self/index",
         });
