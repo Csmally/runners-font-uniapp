@@ -137,7 +137,7 @@ export default {
     },
     async okPopup() {
       let resData = await uniRequest("order/update", "POST", {
-        dbTable: this.orderInfo.campus,
+        dbTable: this.orderInfo.campus + "_orders",
         searchParams: { id: this.orderInfo.id, status: "1" },
         updateParams: {
           runnerAvatarUrl: this.userInfo.avatarUrl,
@@ -149,7 +149,7 @@ export default {
       });
       if (resData.code === 1) {
         let searData = await uniRequest("order/search", "POST", {
-          dbTable: this.orderInfo.campus,
+          dbTable: this.orderInfo.campus + "_orders",
           param: { id: this.orderInfo.id },
         });
         this.isPopupShow = false;
@@ -157,7 +157,7 @@ export default {
           title: "runner,GO！",
           mark: "chat",
           timer: true,
-          orderInfo: JSON.stringify(searData.data[0])
+          orderInfo: JSON.stringify(searData.data[0]),
         });
       } else {
         let options = {

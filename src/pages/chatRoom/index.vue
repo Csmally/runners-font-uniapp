@@ -1,54 +1,56 @@
 <template>
   <view class="container" v-if="userInfo">
     <NavBar mark="home" />
-    <view class="chattitle" :style="{paddingTop:statusBarHeight}">
-      <view class="name">
+    <view class="chattitle">
+      <view class="name" :style="{paddingTop:statusBarHeight}">
         {{userInfo.openid===orderInfo.openid?orderInfo.runnerNickName:orderInfo.nickName}}
       </view>
     </view>
-    <scroll-view scroll-y :scroll-into-view="showid" class="chatbox" id="chatbox">
-      <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
-        <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
-          <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
-          <view v-if="item.msgType==='text'" class="textright">
-            <view class="speakright"></view>
-            <view class="chatcontent">
-              <view>{{item.text}}</view>
+    <view class="mainbox" :style="'width:100%;position: absolute;bottom: '+ keyboardheight">
+      <scroll-view scroll-y :scroll-into-view="showid" class="chatbox" id="chatbox">
+        <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
+          <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
+            <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
+            <view v-if="item.msgType==='text'" class="textright">
+              <view class="speakright"></view>
+              <view class="chatcontent">
+                <view>{{item.text}}</view>
+              </view>
+            </view>
+            <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
+
+            <view v-if="item.msgType==='video'" class="videobox">
+              <image class="chatVideo-r" :style="getVideoStyle(item.style)" :src="item.text" />
+              <image v-if="loadingMap.get(item.text)" class="videoloading-r" src="@/static/loading.png" />
+              <image v-if="!loadingMap.get(item.text)" class="playvideo-r" src="@/static/playVideo.png" @click="lookVideo(item)" />
+            </view>
+
+          </view>
+          <view class="chatleft" v-else>
+            <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
+            <view v-if="item.msgType==='text'" class="textleft">
+              <view class="speakleft"></view>
+              <view class="chatcontent">
+                <view>{{item.text}}</view>
+              </view>
+            </view>
+            <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
+
+            <view v-if="item.msgType==='video'" class="videobox">
+              <image class="chatVideo-l" :style="getVideoStyle(item.style)" :src="item.text" />
+              <image class="playvideo-l" src="@/static/playVideo.png" @click="lookVideo(item)" />
             </view>
           </view>
-          <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
-
-          <view v-if="item.msgType==='video'" class="videobox">
-            <image class="chatVideo-r" :style="getVideoStyle(item.style)" :src="item.text" />
-            <image v-if="loadingMap.get(item.text)" class="videoloading-r" src="@/static/loading.png" />
-            <image v-if="!loadingMap.get(item.text)" class="playvideo-r" src="@/static/playVideo.png" @click="lookVideo(item)" />
-          </view>
-
         </view>
-        <view class="chatleft" v-else>
-          <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
-          <view v-if="item.msgType==='text'" class="textleft">
-            <view class="speakleft"></view>
-            <view class="chatcontent">
-              <view>{{item.text}}</view>
-            </view>
+      </scroll-view>
+      <view class="operationbar">
+        <view class="operationbox">
+          <view class="inputbox">
+            <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
+            <input style="width:100%" auto-height :show-confirm-bar="false" v-model="inputValue" confirm-type="send" @confirm="senMsg" :adjust-position="false" @keyboardheightchange="keyboardheightchange" />
           </view>
-          <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
-
-          <view v-if="item.msgType==='video'" class="videobox">
-            <image class="chatVideo-l" :style="getVideoStyle(item.style)" :src="item.text" />
-            <image class="playvideo-l" src="@/static/playVideo.png" @click="lookVideo(item)" />
-          </view>
+          <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
         </view>
-      </view>
-    </scroll-view>
-    <view class="operationbar">
-      <view class="operationbox">
-        <view class="inputbox">
-          <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
-          <input style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" />
-        </view>
-        <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
       </view>
     </view>
     <video class="covervideo" id="videoplayer" autoplay :direction="0" v-show="isFullScreen" :src="videoPath" @fullscreenchange="fullscreenchange" />
@@ -66,8 +68,11 @@ export default {
     this.userInfo = uni.getStorageSync("userInfo");
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
-    let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
-    socketObj.emit("isChatLogTable", { orderid });
+    let orderid = this.orderInfo.orderid;
+    socketObj.emit("isChatLogTable", {
+      orderid,
+      dbTable: this.userInfo.campus + "_chatlogs",
+    });
     socketObj.on("getAllChatLog", (data) => {
       this.allChatLog = data.allChatLog;
       if (this.allChatLog.length > 0) {
@@ -93,6 +98,7 @@ export default {
       showid: null,
       systemInfo: uni.getStorageSync("systemInfo"),
       loadingMap: new Map(),
+      keyboardheight: "0px",
     };
   },
   methods: {
@@ -101,7 +107,7 @@ export default {
         this.userInfo.openid === this.orderInfo.openid
           ? this.orderInfo.runnerOpenid
           : this.orderInfo.openid;
-      let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
+      let orderid = this.orderInfo.orderid;
       this.socketObj.emit("sendMessage", {
         toopenid,
         msgData: {
@@ -123,7 +129,7 @@ export default {
     chooseMedia() {
       uni.chooseMedia({
         success: async (res) => {
-          let orderid = this.orderInfo.campus + "-" + this.orderInfo.id;
+          let orderid = this.orderInfo.orderid;
           chatSendFiles(res, this, orderid);
         },
       });
@@ -170,7 +176,14 @@ export default {
         videoContext.play();
       } else {
         videoContext.stop();
-        this.isFullScreen = false
+        this.isFullScreen = false;
+      }
+    },
+    keyboardheightchange(e) {
+      if (e.detail.height === 0) {
+        this.keyboardheight = e.detail.height + "px";
+      } else {
+        this.keyboardheight = e.detail.height - 25 + "px";
       }
     },
   },
@@ -178,6 +191,12 @@ export default {
 </script>
 
 <style lang="scss">
+page {
+  background-color: #ededed;
+}
+.mainbox {
+  transition: bottom 0.25s linear;
+}
 .covervideo {
   position: absolute;
 }
@@ -221,7 +240,11 @@ export default {
 }
 .chattitle {
   height: 11vh;
-  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+  background-color: #ffffff;
   .name {
     font-size: 33rpx;
     color: #000;

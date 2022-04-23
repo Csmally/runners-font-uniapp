@@ -1,11 +1,12 @@
 <template>
   <tui-toast ref="toast" position="center"></tui-toast>
-  <button @click="dianji">测试</button>
+  <!-- <button @click="getUserList">获取公众号用户列表</button> -->
   <!-- 主list页面 -->
   <uni-transition mode-class="fade" :show="this.userInfo&&listType==='mainList'">
     <scroll-view class="mainScrollView" refresher-default-style="none" enable-back-to-top lower-threshold="0" @scrolltolower="scrolltolower" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
       <template slot="refresher">
-        <RefreshLoading />
+        <!-- <refreshLoading /> -->
+        <RunRefreshLoading/>
       </template>
       <view>
         <!-- 轮播图 -->
@@ -65,12 +66,28 @@
                 </view>
               </view>
               <image class="desimg" v-if="item.photos" :src="item.photos" mode="widthFix" @click.stop="previewImage(item.photos)" />
-              <view style="color: #a3a2a2;text-align: right;margin: 15rpx 0">
+              <view style="color: #a3a2a2;text-align: right;margin-top: 15rpx">
                 <uni-dateformat :date="item.createdAt" :threshold="[300000, 18000000]"></uni-dateformat>
               </view>
             </view>
-            <view class="itemBottom">
-
+            <view class="operationbar" @click.stop>
+              <view class="operationbaritem" style="overflow: hidden;" @click.stop="award(item.id)">
+                <image :class="'operationimg'+(clickCoinId===item.id?' coinAnimation':'')" src="@/static/coin.png" />
+                <view>打赏</view>
+              </view>
+              <view class="operationbaritem" @click.stop="comment(item.id)">
+                <image class="operationimg" src="@/static/comment.png" />
+                <view>234</view>
+              </view>
+              <view class="operationbaritem" @click.stop="support(item)">
+                <image v-if="item.support===true" class="operationimg heartAnimation" src="@/static/heart.png" />
+                <image v-else class="operationimg" src="@/static/like.png" />
+                <view>234</view>
+              </view>
+            </view>
+            <view v-if="showChatBoxId===item.id">
+              <!-- <chatList /> -->
+              <ChatList/>
             </view>
           </view>
         </view>
@@ -104,10 +121,12 @@
 </template>
 
 <script>
-import RefreshLoading from "@/components/refreshLoading.vue";
-import { uniRequest, jumpTo, pushMessage } from "@/utils/tool.js";
+// import RefreshLoading from "@/components/refreshLoading.vue";
+import { uniRequest, jumpTo } from "@/utils/tool.js";
+import RunRefreshLoading from './refreshLoading.vue';
+import ChatList from "./chatList.vue";
 export default {
-  components: { RefreshLoading },
+  components: { RunRefreshLoading, ChatList },
   data() {
     return {
       cardCur: 0,
@@ -127,11 +146,14 @@ export default {
       searchValue: "",
       searchFocus: false,
       arr: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      clickCoinId: null,
+      showChatBoxId: null,
     };
   },
   onLoad() {},
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
+    clearTimeout();
   },
   watch: {
     "userInfo.campus"() {
@@ -140,21 +162,32 @@ export default {
     },
   },
   methods: {
-    async dianji() {
-      uni.requestSubscribeMessage({
-        tmplIds: ["AmMC8GP5S4h_Mnt08OHSQFLkj3T_kaRpATWe-gsRu6k"],
-        success(res) {
-          pushMessage()
-        },
-        fail(err) {
-          console.log("9898订阅失败", err);
-        },
-      });
-      console.log("9898测试", data);
+    award(id) {
+      console.log("9898打赏了", id);
+      this.clickCoinId = id;
+      setTimeout(() => {
+        this.clickCoinId = null;
+      }, 300);
+    },
+    comment(id) {
+      console.log("9898评论了", id);
+      this.showChatBoxId = id;
+    },
+    support(item) {
+      if (item.support) {
+        item.support = false;
+      } else {
+        item.support = true;
+      }
+      console.log("9898点赞了", item);
+    },
+    async getUserList() {
+      let ii = await uniRequest("wxApi/getServiceUsers", "POST");
+      console.log("9898公众号用户列表", ii);
     },
     async testSearch() {
       let data = await uniRequest("order/search", "POST", {
-        dbTable: this.userInfo.campus,
+        dbTable: this.userInfo.campus + "_orders",
         param: {
           $or: [
             {
@@ -175,28 +208,19 @@ export default {
     },
     async getData(mark) {
       if (this.userInfo.type === "1") {
-        console.log("9898现在是客户模式了", this.userInfo.campus);
+        console.log("9898现在是客户模式了11", this.userInfo.campus);
         let resData = await uniRequest("order/search", "POST", {
-          dbTable: this.userInfo.campus,
-          param:
-            mark === "top" && this.data.length > 0
-              ? { status: 1, id: { $gt: this.data[0].id } }
-              : { status: 1 },
+          dbTable: this.userInfo.campus + "_orders",
+          param: { status: 1 },
           otherParam:
-            mark === "start"
-              ? { limit: 10 }
-              : mark === "top"
-              ? {}
-              : { limit: 10, offset: this.data.length },
+            mark === "bottom"
+              ? { limit: 10, offset: this.data.length }
+              : { limit: 10 },
         });
-        if (mark === "start") {
-          this.data = resData.data;
-        }
-        if (mark === "top") {
-          this.data.unshift(...resData.data);
-        }
         if (mark === "bottom") {
           this.data.push(...resData.data);
+        } else {
+          this.data = resData.data;
         }
         if (resData.data.length === 0) {
           this.noMore = true;
@@ -204,7 +228,7 @@ export default {
       } else {
         console.log("9898游客模式下只显示十条数据");
         let resData = await uniRequest("order/search", "POST", {
-          dbTable: "beida",
+          dbTable: "qinghua_orders",
           param: { status: 1 },
           otherParam: { limit: 10 },
         });
@@ -280,6 +304,40 @@ export default {
 </script>
 
 <style lang="scss">
+.coinAnimation {
+  animation: coinJump 0.3s ease-in-out;
+}
+@keyframes coinJump {
+  0% {
+    transform: translateY(0rpx) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-45rpx) rotateY(180deg);
+  }
+  100% {
+    transform: translateY(0rpx) rotateY(360deg);
+  }
+}
+.heartAnimation {
+  animation: heart 0.4s ease-in-out;
+}
+@keyframes heart {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 .mainScrollView {
   height: 100vh;
 }
@@ -375,6 +433,21 @@ export default {
   /* background-color: rgb(227, 162, 230); */
   padding: 20rpx;
   border-bottom: 1px dashed #e2dfdf;
+  .operationbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .operationbaritem {
+      padding-top: 45rpx;
+      display: flex;
+      align-items: center;
+      .operationimg {
+        width: 45rpx;
+        height: 45rpx;
+        margin-right: 5rpx;
+      }
+    }
+  }
 }
 .itemTop {
   display: flex;
@@ -434,7 +507,7 @@ export default {
   }
 }
 .itemMiddle {
-  margin: 30rpx 0;
+  margin-top: 30rpx;
   view image {
     width: 45rpx;
     height: 45rpx;

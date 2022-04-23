@@ -1,7 +1,6 @@
 import wxKeys from '/pswConfig/wxKeysConfig.js'
 
-const host =
-    import.meta.env.VITE_HOST + '/wx/getUeserInfoFromWx'
+const host = import.meta.env.VITE_HOST + '/wx/wxApi/getUeserInfoFromWx'
 export function getOpenid() {
     return new Promise((resolve, reject) => {
         uni.login({

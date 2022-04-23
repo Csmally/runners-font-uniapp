@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { uniRequest, jumpTo, wxPay, uploadFile } from "@/utils/tool.js";
+import { uniRequest, jumpTo, wxPay, uploadFile, getRandomId } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64, orderBase64 } from "@/base64/index.js";
 export default {
   props: {
@@ -228,11 +228,12 @@ export default {
         goodsPrice: Number(this.form.goodsPrice).toFixed(2),
         price: Number(this.form.price).toFixed(2),
         openid: this.userInfo.openid,
-        dbTable: this.userInfo.campus,
+        dbTable: this.userInfo.campus + "_orders",
         avatarUrl: this.userInfo.avatarUrl,
         gender: this.userInfo.gender,
         nickName: this.userInfo.nickName,
         campus: this.userInfo.campus,
+        orderid: this.userInfo.campus + getRandomId(),
         status: 1,
       });
       for (const key in this.form) {
