@@ -142,16 +142,17 @@ export default {
       if (resData.data.length > 0 && this.currentTab === 1) {
         let searchParam = [];
         for (const item of resData.data) {
-          searchParam.push({ orderid: item.campus + "-" + item.id });
+          searchParam.push({ orderid: item.orderid });
         }
         let chatInfo = await uniRequest("chatLogs/search", "POST", {
+          dbTable: this.userInfo.campus + "_chatlogs",
           param: {
             $or: searchParam,
           },
         });
         for (const item of resData.data) {
           for (const item1 of chatInfo.data) {
-            if (item.campus + "-" + item.id === item1.orderid) {
+            if (item.orderid === item1.orderid) {
               if (JSON.parse(item1.content).length > 0) {
                 item.lastChat = JSON.parse(item1.content)[
                   JSON.parse(item1.content).length - 1

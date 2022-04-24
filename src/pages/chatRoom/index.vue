@@ -47,7 +47,7 @@
         <view class="operationbox">
           <view class="inputbox">
             <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
-            <input style="width:100%" auto-height :show-confirm-bar="false" v-model="inputValue" confirm-type="send" @confirm="senMsg" :adjust-position="false" @keyboardheightchange="keyboardheightchange" />
+            <input style="width:100%" auto-height :show-confirm-bar="false" v-model="inputValue" confirm-type="send" confirm-hold @confirm="senMsg" :adjust-position="false" @keyboardheightchange="keyboardheightchange" />
           </view>
           <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
         </view>
@@ -110,6 +110,7 @@ export default {
       let orderid = this.orderInfo.orderid;
       this.socketObj.emit("sendMessage", {
         toopenid,
+        dbTable: this.userInfo.campus + "_chatlogs",
         msgData: {
           text: this.inputValue,
           orderid,

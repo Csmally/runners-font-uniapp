@@ -6,7 +6,7 @@
     <scroll-view class="mainScrollView" refresher-default-style="none" enable-back-to-top lower-threshold="0" @scrolltolower="scrolltolower" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
       <template slot="refresher">
         <!-- <refreshLoading /> -->
-        <RunRefreshLoading/>
+        <RefreshLoading/>
       </template>
       <view>
         <!-- 轮播图 -->
@@ -123,10 +123,11 @@
 <script>
 // import RefreshLoading from "@/components/refreshLoading.vue";
 import { uniRequest, jumpTo } from "@/utils/tool.js";
-import RunRefreshLoading from './refreshLoading.vue';
+import RefreshLoading from './refreshLoading.vue';
 import ChatList from "./chatList.vue";
 export default {
-  components: { RunRefreshLoading, ChatList },
+  components: { RefreshLoading, ChatList },
+  // components: { RefreshLoading },
   data() {
     return {
       cardCur: 0,
