@@ -7,38 +7,40 @@
       </view>
     </view>
     <view class="mainbox" :style="'width:100%;position: absolute;bottom: '+ keyboardheight">
-      <scroll-view scroll-y :scroll-into-view="showid" class="chatbox" id="chatbox">
-        <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
-          <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
-            <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
-            <view v-if="item.msgType==='text'" class="textright">
-              <view class="speakright"></view>
-              <view class="chatcontent">
-                <view>{{item.text}}</view>
+      <scroll-view scroll-y :scroll-into-view="showid" :scroll-top="scrollTop" class="chatbox" id="chatbox" scroll-anchoring :scroll-with-animation="scrollAnimation" :style="'padding-top: '+chatboxPaddingTop+'px'">
+        <view id="chatcontentbox">
+          <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
+            <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
+              <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
+              <view v-if="item.msgType==='text'" class="textright">
+                <view class="speakright"></view>
+                <view class="chatcontent">
+                  <view>{{item.text}}</view>
+                </view>
               </view>
-            </view>
-            <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
+              <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
 
-            <view v-if="item.msgType==='video'" class="videobox">
-              <image class="chatVideo-r" :style="getVideoStyle(item.style)" :src="item.text" />
-              <image v-if="loadingMap.get(item.text)" class="videoloading-r" src="@/static/loading.png" />
-              <image v-if="!loadingMap.get(item.text)" class="playvideo-r" src="@/static/playVideo.png" @click="lookVideo(item)" />
-            </view>
-
-          </view>
-          <view class="chatleft" v-else>
-            <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
-            <view v-if="item.msgType==='text'" class="textleft">
-              <view class="speakleft"></view>
-              <view class="chatcontent">
-                <view>{{item.text}}</view>
+              <view v-if="item.msgType==='video'" class="videobox">
+                <image class="chatVideo-r" :style="getVideoStyle(item.style)" :src="item.text" />
+                <image v-if="loadingMap.get(item.text)" class="videoloading-r" src="@/static/loading.png" />
+                <image v-if="!loadingMap.get(item.text)" class="playvideo-r" src="@/static/playVideo.png" @click="lookVideo(item)" />
               </view>
-            </view>
-            <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
 
-            <view v-if="item.msgType==='video'" class="videobox">
-              <image class="chatVideo-l" :style="getVideoStyle(item.style)" :src="item.text" />
-              <image class="playvideo-l" src="@/static/playVideo.png" @click="lookVideo(item)" />
+            </view>
+            <view class="chatleft" v-else>
+              <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
+              <view v-if="item.msgType==='text'" class="textleft">
+                <view class="speakleft"></view>
+                <view class="chatcontent">
+                  <view>{{item.text}}</view>
+                </view>
+              </view>
+              <image class="chatImage" v-if="item.msgType==='image'" :src="item.text" lazy-load mode="heightFix" @click="previewImage(item.text)" />
+
+              <view v-if="item.msgType==='video'" class="videobox">
+                <image class="chatVideo-l" :style="getVideoStyle(item.style)" :src="item.text" />
+                <image class="playvideo-l" src="@/static/playVideo.png" @click="lookVideo(item)" />
+              </view>
             </view>
           </view>
         </view>
@@ -47,7 +49,7 @@
         <view class="operationbox">
           <view class="inputbox">
             <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
-            <input style="width:100%" auto-height :show-confirm-bar="false" v-model="inputValue" confirm-type="send" confirm-hold @confirm="senMsg" :adjust-position="false" @keyboardheightchange="keyboardheightchange" />
+            <input style="width:100%" auto-height :show-confirm-bar="false" v-model="inputValue" confirm-type="send" confirm-hold @confirm="senMsg" :adjust-position="false" @keyboardheightchange="keyboardheightchange" @blur="blurInput" @focus="focusInput"/>
           </view>
           <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
         </view>
@@ -83,6 +85,10 @@ export default {
       this.allChatLog.push(data.msgData);
       this.showid = "showid" + (this.allChatLog.length - 1);
     });
+    setTimeout(() => {
+      this.scrollAnimation = true;
+      clearTimeout();
+    }, 500);
   },
   data() {
     return {
@@ -99,6 +105,8 @@ export default {
       systemInfo: uni.getStorageSync("systemInfo"),
       loadingMap: new Map(),
       keyboardheight: "0px",
+      scrollAnimation: false,
+      chatboxPaddingTop: 0,
     };
   },
   methods: {
@@ -180,12 +188,49 @@ export default {
         this.isFullScreen = false;
       }
     },
+    blurInput() {
+      this.chatboxPaddingTop = 0;
+    },
+    focusInput() {
+      this.showid = "showid" + (this.allChatLog.length - 1);
+    },
     keyboardheightchange(e) {
       if (e.detail.height === 0) {
         this.keyboardheight = e.detail.height + "px";
       } else {
         this.keyboardheight = e.detail.height - 25 + "px";
+        let mainHeight =
+          (this.systemInfo.windowHeight / 100) * 78 - e.detail.height + 25;
+        uni
+          .createSelectorQuery()
+          .in(this)
+          .select("#chatcontentbox")
+          .boundingClientRect((data) => {
+            let infoHeight = data.height;
+            if (infoHeight < mainHeight || infoHeight === mainHeight) {
+              this.chatboxPaddingTop = e.detail.height - 25;
+            }
+            if (
+              infoHeight > (this.systemInfo.windowHeight / 100) * 78 ||
+              infoHeight === (this.systemInfo.windowHeight / 100) * 78
+            ) {
+              this.chatboxPaddingTop = 0;
+            }
+            if (
+              infoHeight > mainHeight &&
+              infoHeight < (this.systemInfo.windowHeight / 100) * 78
+            ) {
+              this.chatboxPaddingTop =
+                (this.systemInfo.windowHeight / 100) * 78 - infoHeight;
+            }
+            if (infoHeight > (this.systemInfo.windowHeight / 100) * 78) {
+              this.chatboxPaddingTop = 0;
+            }
+          })
+          .exec();
+        console.log();
       }
+      this.showid = "showid" + (this.allChatLog.length - 1);
     },
   },
 };
@@ -196,7 +241,7 @@ page {
   background-color: #ededed;
 }
 .mainbox {
-  transition: bottom 0.25s linear;
+  transition: bottom 0.15s ease;
 }
 .covervideo {
   position: absolute;
@@ -275,6 +320,8 @@ page {
   background-color: #ededed;
   width: 100%;
   height: 78vh;
+  box-sizing: border-box;
+  transition: padding-top 0.15s ease;
   .chatInfo {
     padding: 20rpx 25rpx;
     .chatright {

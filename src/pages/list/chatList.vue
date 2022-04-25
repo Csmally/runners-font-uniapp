@@ -1,7 +1,7 @@
 <template>
   <view class="container" @click.stop>
     <view class="loading" v-if="loading">
-      <image src="@/static/loadingBottom.png" />
+      <image :src="base64Img.loadingChatList" />
     </view>
     <uni-transition :mode-class="['fade','zoom-in']" :show="!loading">
       <view class="chatBox">
@@ -36,9 +36,11 @@
 </template>
 
 <script>
+import base64Img from "@/base64/common.json"
 export default {
   data() {
     return {
+      base64Img,
       loading: true,
       inputValue: "",
     };

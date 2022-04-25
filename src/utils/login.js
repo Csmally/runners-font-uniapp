@@ -1,4 +1,4 @@
-import wxKeys from '/pswConfig/wxKeysConfig.js'
+import wxKeys from '/pswConfig/wxKeysConfig.json'
 
 const host = import.meta.env.VITE_HOST + '/wx/wxApi/getUeserInfoFromWx'
 export function getOpenid() {
