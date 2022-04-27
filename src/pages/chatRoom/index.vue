@@ -3,7 +3,7 @@
     <NavBar mark="home" />
     <view class="chattitle">
       <view class="name" :style="{paddingTop:statusBarHeight}">
-        {{userInfo.openid===orderInfo.openid?orderInfo.runnerNickName:orderInfo.nickName}}
+        {{userInfo.openid===orderInfo.publisherOpenid?orderInfo.runnerInfo.nickName:orderInfo.publisherInfo.nickName}}
       </view>
     </view>
     <view class="mainbox" :style="'width:100%;position: absolute;bottom: '+ keyboardheight">
@@ -11,7 +11,7 @@
         <view id="chatcontentbox">
           <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
             <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
-              <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.avatarUrl:orderInfo.runnerAvatarUrl" />
+              <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.publisherInfo.avatarUrl:orderInfo.runnerInfo.avatarUrl" />
               <view v-if="item.msgType==='text'" class="textright">
                 <view class="speakright"></view>
                 <view class="chatcontent">
@@ -28,7 +28,7 @@
 
             </view>
             <view class="chatleft" v-else>
-              <image class="avatarimage" :src="userInfo.openid===orderInfo.openid?orderInfo.runnerAvatarUrl:orderInfo.avatarUrl" />
+              <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.publisherInfo.avatarUrl:orderInfo.runnerInfo.avatarUrl" />
               <view v-if="item.msgType==='text'" class="textleft">
                 <view class="speakleft"></view>
                 <view class="chatcontent">
@@ -66,7 +66,8 @@ import { chatSendFiles } from "@/utils/tool.js";
 export default {
   components: { navigationBar, NavBar },
   onLoad(option) {
-    this.orderInfo = option;
+    this.orderInfo = JSON.parse(option.orderInfo);
+    console.log('9898看看',this.orderInfo)
     this.userInfo = uni.getStorageSync("userInfo");
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
@@ -112,9 +113,9 @@ export default {
   methods: {
     senMsg() {
       let toopenid =
-        this.userInfo.openid === this.orderInfo.openid
+        this.userInfo.openid === this.orderInfo.publisherOpenid
           ? this.orderInfo.runnerOpenid
-          : this.orderInfo.openid;
+          : this.orderInfo.publisherOpenid;
       let orderid = this.orderInfo.orderid;
       this.socketObj.emit("sendMessage", {
         toopenid,

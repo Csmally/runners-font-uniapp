@@ -52,7 +52,9 @@ export default {
       isChanging: false,
     };
   },
-  onLoad() {},
+  onLoad() {
+    console.log('9898进来第二页')
+  },
   onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     if (this.currentTab !== 0) {
@@ -82,7 +84,7 @@ export default {
           param = {
             status: 2,
             $or: [
-              { openid: this.userInfo.openid },
+              { publisherOpenid: this.userInfo.openid },
               { runnerOpenid: this.userInfo.openid },
             ],
           };
@@ -90,7 +92,7 @@ export default {
         if (this.typeIndex == 1) {
           param = {
             status: 2,
-            openid: this.userInfo.openid,
+            publisherOpenid: this.userInfo.openid,
           };
         }
         if (this.typeIndex == 2) {
@@ -103,7 +105,7 @@ export default {
       if (this.currentTab === 2) {
         param = {
           status: 1,
-          openid: this.userInfo.openid,
+          publisherOpenid: this.userInfo.openid,
         };
       }
       if (this.currentTab === 3) {
@@ -113,7 +115,7 @@ export default {
               $or: [3, 4],
             },
             $or: [
-              { openid: this.userInfo.openid },
+              { publisherOpenid: this.userInfo.openid },
               { runnerOpenid: this.userInfo.openid },
             ],
           };
@@ -123,7 +125,7 @@ export default {
             status: {
               $or: [3, 4],
             },
-            openid: this.userInfo.openid,
+            publisherOpenid: this.userInfo.openid,
           };
         }
         if (this.typeIndex == 2) {
@@ -136,34 +138,16 @@ export default {
         }
       }
       let resData = await uniRequest("order/search", "POST", {
+        type: "orderPageList",
         dbTable: this.userInfo.campus,
         param,
       });
-      if (resData.data.length > 0 && this.currentTab === 1) {
-        let searchParam = [];
-        for (const item of resData.data) {
-          searchParam.push({ orderid: item.orderid });
-        }
-        let chatInfo = await uniRequest("chatLogs/search", "POST", {
-          dbTable: this.userInfo.campus + "_chatlogs",
-          param: {
-            $or: searchParam,
-          },
-        });
-        for (const item of resData.data) {
-          for (const item1 of chatInfo.data) {
-            if (item.orderid === item1.orderid) {
-              if (JSON.parse(item1.content).length > 0) {
-                item.lastChat = JSON.parse(item1.content)[
-                  JSON.parse(item1.content).length - 1
-                ];
-              } else {
-                item.lastChat = null;
-              }
-              break;
-            }
-          }
-        }
+      console.log("9898查询结果", resData);
+      for (const item of resData.data) {
+        item.lastChat =
+          JSON.parse(item.chatLogs.content).length > 0
+            ? JSON.parse(item.chatLogs.content)[0]
+            : null;
       }
       this.orderData = resData.data;
       this.isChanging = false;

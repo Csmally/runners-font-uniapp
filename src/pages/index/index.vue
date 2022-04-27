@@ -58,6 +58,7 @@ export default {
       //如果是老用户 返回用户信息，并存到本地
       uni.setStorageSync("isFirst", false);
       uni.setStorageSync("userInfo", userData.data);
+      uni.setStorageSync("isCreateNewOrder", false);
       this.loading = false;
       uni.switchTab({
         url: "/pages/list/index",
@@ -70,8 +71,8 @@ export default {
   methods: {
     async saveUserInfo(type, value) {
       let proInfo = await getUserProfile();
+      uni.setStorageSync("isCreateNewOrder", false);
       let cloudPhotoPath = null;
-      let localFilePath = null;
       if (proInfo) {
         let resData = await uniRequest("txCos/saveAvatar", "POST", {
           folder: "userAvatar/",

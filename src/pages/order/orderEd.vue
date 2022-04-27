@@ -3,8 +3,8 @@
     <view class="contentitem" v-for="item in orderData" :key="item.id">
       <view class="title">
         <view class="info">
-          <image v-if="item.status===3" :src="item.openid===userInfo.openid?item.runnerAvatarUrl:item.avatarUrl" />
-          <view>{{item.goodsName}}</view>
+          <image v-if="item.status===3" :src="item.publisherOpenid===userInfo.openid?item.runnerInfo.avatarUrl:item.publisherInfo.avatarUrl" />
+          <view class="titletext">{{item.goodsName}}</view>
         </view>
         <view style="color: #a19f9f">{{item.status===3?"已完成":"已取消"}}</view>
       </view>
@@ -12,7 +12,7 @@
         <image class="goodsimg" v-if="item.photos" :src="item.photos" />
         <view class="priceinfo" style="margin:20rpx 0">
           <view>{{item.goodsAddress}}</view>
-          <view>商品价格：{{item.goodsPrice.toFixed(2)}}</view>
+          <view>商品价格11：{{item.goodsPrice.toFixed(2)}}</view>
           <view>报酬：{{item.price.toFixed(2)}}</view>
         </view>
       </view>
@@ -23,7 +23,7 @@
           <text>{{(item.goodsPrice+item.price).toFixed(2)}}</text>
         </view>
         <view class="date">{{item.createdAt}}</view>
-        <view class="cancelorder" v-if="item.openid===userInfo.openid">再来一单</view>
+        <view class="cancelorder" v-if="item.openid===userInfo.publisherOpenid">再来一单</view>
       </view>
     </view>
   </view>
@@ -70,6 +70,10 @@ export default {
       .info {
         display: flex;
         align-items: center;
+        .titletext {
+          font-size: 40rpx;
+          font-weight: 500;
+        }
         image {
           width: 80rpx;
           height: 80rpx;

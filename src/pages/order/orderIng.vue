@@ -1,19 +1,19 @@
 <template>
   <view class="container">
     <view v-for="item in orderData" :key="item.id" class="chatitem" @click="selectChat(item)">
-      <image v-if="userInfo.openid===item.openid" class="avatar" :src="item.runnerAvatarUrl" />
-      <image v-else class="avatar" :src="item.avatarUrl" />
+      <image v-if="userInfo.openid===item.publisherOpenid" class="avatar" :src="item.runnerInfo.avatarUrl" />
+      <image v-else class="avatar" :src="item.publisherInfo.avatarUrl" />
       <view class="nameandinfo">
         <view class="nickname">
-          <view v-if="userInfo.openid===item.openid">{{item.runnerNickName}}</view>
-          <view v-else>{{item.nickName}}</view>
+          <view v-if="userInfo.openid===item.publisherOpenid">{{item.runnerInfo.nickName}}</view>
+          <view v-else>{{item.publisherInfo.nickName}}</view>
         </view>
-        <view class="chatinfo hiddenText">
+        <view>
           <view v-if="item.lastChat">
-            <text v-if="item.lastChat.msgType==='text'">{{item.lastChat.text}}</text>
-            <text v-if="item.lastChat.msgType==='voice'">[语音]</text>
-            <text v-if="item.lastChat.msgType==='image'">[图片]</text>
-            <text v-if="item.lastChat.msgType==='video'">[视频]</text>
+            <view class="chatinfo hiddenText" v-if="item.lastChat.msgType==='text'">{{item.lastChat.text}}</view>
+            <view class="chatinfo hiddenText" v-if="item.lastChat.msgType==='voice'">[语音]</view>
+            <view class="chatinfo hiddenText" v-if="item.lastChat.msgType==='image'">[图片]</view>
+            <view class="chatinfo hiddenText" v-if="item.lastChat.msgType==='video'">[视频]</view>
           </view>
         </view>
       </view>
@@ -22,7 +22,7 @@
           {{item.goodsName}}
         </view>
         <view style="text-align: right">
-          <image v-if="userInfo.openid===item.openid" class="ordertype" src="@/static/ordersend.png" />
+          <image v-if="userInfo.openid===item.publisherOpenid" class="ordertype" src="@/static/ordersend.png" />
           <image v-else class="ordertype" src="@/static/orderget.png" />
         </view>
       </view>
@@ -52,12 +52,12 @@ export default {
       data: [],
       socketTask: null,
       socketOpen: false,
-      test: 1
+      test: 1,
     };
   },
   methods: {
     selectChat(item) {
-      jumpTo("/pages/chatRoom/index", item);
+      jumpTo("/pages/chatRoom/index", { orderInfo: JSON.stringify(item) });
     },
   },
 };

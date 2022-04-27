@@ -6,9 +6,9 @@
     <view class="content" v-if="orderInfo">
       <view class="top">
         <view class="avatar">
-          <image class="genderImg" v-if="orderInfo.gender==='1'" src="@/static/man.png" mode="aspectFit" />
-          <image class="genderImg" v-if="orderInfo.gender==='2'" src="@/static/woman.png" mode="aspectFit" />
-          <image :src="orderInfo.avatarUrl" class="avatarimg" />
+          <image class="genderImg" v-if="orderInfo.publisherInfo.gender==='1'" src="@/static/man.png" mode="aspectFit" />
+          <image class="genderImg" v-if="orderInfo.publisherInfo.gender==='2'" src="@/static/woman.png" mode="aspectFit" />
+          <image :src="orderInfo.publisherInfo.avatarUrl" class="avatarimg" />
         </view>
       </view>
       <view class="middle">
@@ -88,7 +88,7 @@
           </view>
         </view>
       </view>
-      <fui-button v-if="orderInfo.openid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
+      <fui-button v-if="orderInfo.publisherOpenid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
     </view>
     <tui-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="isPopupShow" @close="closePopup">
       <view class="popupCampus">
@@ -109,6 +109,7 @@ export default {
   onLoad(option) {
     this.userInfo = uni.getStorageSync("userInfo");
     let orderInfo = JSON.parse(JSON.stringify(option));
+    orderInfo.publisherInfo = JSON.parse(orderInfo.publisherInfo)
     for (const key in orderInfo) {
       if (orderInfo[key] === "null") {
         orderInfo[key] = null;
@@ -139,15 +140,13 @@ export default {
         dbTable: this.orderInfo.campus + "_orders",
         searchParams: { id: this.orderInfo.id, status: "1" },
         updateParams: {
-          runnerAvatarUrl: this.userInfo.avatarUrl,
-          runnerGender: this.userInfo.gender,
-          runnerNickName: this.userInfo.nickName,
           runnerOpenid: this.userInfo.openid,
           status: "2",
         },
       });
       if (resData.code === 1) {
         let searData = await uniRequest("order/search", "POST", {
+          type: "orderPageList",
           dbTable: this.orderInfo.campus,
           param: { id: this.orderInfo.id },
         });
@@ -156,7 +155,7 @@ export default {
           title: "runner,GO！",
           mark: "chat",
           timer: true,
-          orderInfo: JSON.stringify(searData.data[0]),
+          orderInfo: JSON.stringify(searData.data[0])
         });
       } else {
         let options = {

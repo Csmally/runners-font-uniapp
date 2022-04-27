@@ -30,11 +30,11 @@
             <view class="itemTop">
               <view class="topLeft">
                 <view class="avatar">
-                  <image class="avatarImg" :src="item.avatarUrl" mode="aspectFit" />
-                  <image v-if="item.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
-                  <image v-if="item.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
+                  <image class="avatarImg" :src="item.publisherInfo.avatarUrl" mode="aspectFit" />
+                  <image v-if="item.publisherInfo.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
+                  <image v-if="item.publisherInfo.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
                 </view>
-                <view class="nickName">{{item.nickName}}</view>
+                <view class="nickName">{{item.publisherInfo.nickName}}</view>
               </view>
               <view class="topRight">
                 <view class="followin">关注</view>
@@ -145,10 +145,16 @@ export default {
       showChatBoxId: null,
     };
   },
-  onLoad() {},
+  onLoad() {
+    console.log('9898进来第一页')
+  },
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     clearTimeout();
+    if(uni.getStorageSync("isCreateNewOrder")){
+      await this.getData("start")
+      uni.setStorageSync("isCreateNewOrder", false)
+    }
   },
   watch: {
     "userInfo.campus"() {
@@ -158,7 +164,7 @@ export default {
   },
   methods: {
     searchTest() {
-      this.getData("start")
+      this.getData("start");
     },
     award(id) {
       this.clickCoinId = id;
@@ -207,7 +213,7 @@ export default {
         let resData = await uniRequest("order/search", "POST", {
           dbTable: this.userInfo.campus,
           param: { status: 1 },
-          type: "orderList",
+          type: "orderMainList",
           otherParam:
             mark === "bottom"
               ? { limit: 10, offset: this.data.length }
@@ -226,7 +232,7 @@ export default {
         let resData = await uniRequest("order/search", "POST", {
           dbTable: "qinghua",
           param: { status: 1 },
-          type: "orderList",
+          type: "orderMainList",
           otherParam: { limit: 10 },
         });
         this.data = resData.data;
@@ -271,7 +277,10 @@ export default {
     selectItem(item) {
       if (this.userInfo.type === "1") {
         console.log("9898item", item);
-        jumpTo("/pages/list/moreInfo", { ...item });
+        jumpTo("/pages/list/moreInfo", {
+          ...item,
+          publisherInfo: JSON.stringify(item.publisherInfo),
+        });
       } else {
         let options = {
           title: "游客模式下暂时无法查看更多",

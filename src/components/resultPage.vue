@@ -72,7 +72,7 @@ export default {
       let aa = setInterval(() => {
         if (this.time === 1) {
           clearInterval(aa);
-          jumpTo("/pages/chatRoom/index", this.orderInfo);
+          jumpTo("/pages/chatRoom/index", { orderInfo: this.orderInfo});
         }
         this.time--;
       }, 1000);
@@ -96,7 +96,7 @@ export default {
       default: false,
     },
     orderInfo: {
-      type: Object,
+      type: String,
       default: null,
     },
   },

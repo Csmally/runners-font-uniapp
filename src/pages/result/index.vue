@@ -1,6 +1,6 @@
 <template>
-  <NavBar :mark="mark" :orderInfo="orderInfo"/>
-  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" :timer="timer" :orderInfo="orderInfo"/>
+  <NavBar :mark="mark" :orderInfo="orderInfo" />
+  <ResultPage :title="title" :titleColor="titleColor" :canvasColor="canvasColor" :timer="timer" :orderInfo="orderInfo" />
 </template>
 
 <script>
@@ -22,17 +22,14 @@ export default {
     this.title = option.title;
     this.titleColor = option.titleColor;
     this.canvasColor = option.canvasColor;
-    this.orderInfo = option.orderInfo?JSON.parse(option.orderInfo):null
-  },
-  onShow() {
-    console.log('9898传过来了没11',this.orderInfo)
+    this.orderInfo = option.orderInfo ? option.orderInfo : null;
   },
   data() {
     return {
       title: null,
       titleColor: null,
       canvasColor: null,
-      orderInfo: null
+      orderInfo: null,
     };
   },
   methods: {},

@@ -227,11 +227,8 @@ export default {
         photos: cloudPhotoPath,
         goodsPrice: Number(this.form.goodsPrice).toFixed(2),
         price: Number(this.form.price).toFixed(2),
-        openid: this.userInfo.openid,
+        publisherOpenid: this.userInfo.openid,
         dbTable: this.userInfo.campus + "_orders",
-        avatarUrl: this.userInfo.avatarUrl,
-        gender: this.userInfo.gender,
-        nickName: this.userInfo.nickName,
         campus: this.userInfo.campus,
         orderid: this.userInfo.campus + getRandomId(),
         status: 1,
@@ -245,6 +242,7 @@ export default {
       }
       this.submitLoading = false;
       this.isContentShow = true;
+      uni.setStorageSync("isCreateNewOrder", true)
       jumpTo("/pages/result/index", { title: "发送成功！" });
     },
   },

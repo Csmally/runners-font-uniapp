@@ -5,7 +5,10 @@
       <view>动画测试</view>
     </uni-transition> -->
     <view class="contentitem" v-for="item in orderData" :key="item.id">
-      <view class="title">{{item.goodsName}}</view>
+      <view class="title">
+        <view class="titleleft">{{item.goodsName}}</view>
+        <view class="titleright">等待接单</view>
+      </view>
       <view :class="item.photos?'middleinfo':''">
         <image class="goodsimg" v-if="item.photos" :src="item.photos"/>
         <view class="priceinfo" style="margin:20rpx 0">
@@ -64,8 +67,16 @@ export default {
     padding: 20rpx;
     box-shadow: 0rpx 0rpx 10rpx 10rpx #d3d3d3;
     .title {
-      font-size: 40rpx;
-      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .titleleft {
+        font-size: 40rpx;
+        font-weight: 500;
+      }
+      .titleright {
+        color: #a19f9f;
+      }
     }
     .middleinfo {
       display: flex;
