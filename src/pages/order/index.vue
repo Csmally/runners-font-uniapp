@@ -136,7 +136,7 @@ export default {
         }
       }
       let resData = await uniRequest("order/search", "POST", {
-        dbTable: this.userInfo.campus + "_orders",
+        dbTable: this.userInfo.campus,
         param,
       });
       if (resData.data.length > 0 && this.currentTab === 1) {

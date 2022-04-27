@@ -5,8 +5,7 @@
   <uni-transition mode-class="fade" :show="this.userInfo&&listType==='mainList'">
     <scroll-view class="mainScrollView" refresher-default-style="none" enable-back-to-top lower-threshold="0" @scrolltolower="scrolltolower" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
       <template slot="refresher">
-        <!-- <refreshLoading /> -->
-        <RefreshLoading/>
+        <RefreshLoading />
       </template>
       <view>
         <!-- 轮播图 -->
@@ -77,7 +76,7 @@
               </view>
               <view class="operationbaritem" @click.stop="comment(item.id)">
                 <image class="operationimg" src="@/static/comment.png" />
-                <view>234</view>
+                <view>{{item.chatList.length===0?"写评论":item.chatList.length}}</view>
               </view>
               <view class="operationbaritem" @click.stop="support(item)">
                 <image v-if="item.support===true" class="operationimg heartAnimation" src="@/static/heart.png" />
@@ -85,10 +84,7 @@
                 <view>234</view>
               </view>
             </view>
-            <view v-if="showChatBoxId===item.id">
-              <!-- <chatList /> -->
-              <ChatList/>
-            </view>
+            <ChatList v-if="showChatBoxId===item.id" :orderid="item.orderid" :userInfo="userInfo" />
           </view>
         </view>
       </view>
@@ -121,13 +117,11 @@
 </template>
 
 <script>
-// import RefreshLoading from "@/components/refreshLoading.vue";
 import { uniRequest, jumpTo } from "@/utils/tool.js";
-import RefreshLoading from './refreshLoading.vue';
+import RefreshLoading from "./refreshLoading.vue";
 import ChatList from "./chatList.vue";
 export default {
   components: { RefreshLoading, ChatList },
-  // components: { RefreshLoading },
   data() {
     return {
       cardCur: 0,
@@ -163,15 +157,16 @@ export default {
     },
   },
   methods: {
+    searchTest() {
+      this.getData("start")
+    },
     award(id) {
-      console.log("9898打赏了", id);
       this.clickCoinId = id;
       setTimeout(() => {
         this.clickCoinId = null;
       }, 300);
     },
     comment(id) {
-      console.log("9898评论了", id);
       this.showChatBoxId = id;
     },
     support(item) {
@@ -180,7 +175,6 @@ export default {
       } else {
         item.support = true;
       }
-      console.log("9898点赞了", item);
     },
     async getUserList() {
       let ii = await uniRequest("wxApi/getServiceUsers", "POST");
@@ -188,7 +182,7 @@ export default {
     },
     async testSearch() {
       let data = await uniRequest("order/search", "POST", {
-        dbTable: this.userInfo.campus + "_orders",
+        dbTable: this.userInfo.campus,
         param: {
           $or: [
             {
@@ -211,8 +205,9 @@ export default {
       if (this.userInfo.type === "1") {
         console.log("9898现在是客户模式了11", this.userInfo.campus);
         let resData = await uniRequest("order/search", "POST", {
-          dbTable: this.userInfo.campus + "_orders",
+          dbTable: this.userInfo.campus,
           param: { status: 1 },
+          type: "orderList",
           otherParam:
             mark === "bottom"
               ? { limit: 10, offset: this.data.length }
@@ -229,8 +224,9 @@ export default {
       } else {
         console.log("9898游客模式下只显示十条数据");
         let resData = await uniRequest("order/search", "POST", {
-          dbTable: "qinghua_orders",
+          dbTable: "qinghua",
           param: { status: 1 },
+          type: "orderList",
           otherParam: { limit: 10 },
         });
         this.data = resData.data;

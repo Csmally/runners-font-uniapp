@@ -107,7 +107,6 @@ import { uniRequest, jumpTo } from "@/utils/tool.js";
 export default {
   components: { NavBar },
   onLoad(option) {
-    console.log("9898orderInfo");
     this.userInfo = uni.getStorageSync("userInfo");
     let orderInfo = JSON.parse(JSON.stringify(option));
     for (const key in orderInfo) {
@@ -149,7 +148,7 @@ export default {
       });
       if (resData.code === 1) {
         let searData = await uniRequest("order/search", "POST", {
-          dbTable: this.orderInfo.campus + "_orders",
+          dbTable: this.orderInfo.campus,
           param: { id: this.orderInfo.id },
         });
         this.isPopupShow = false;

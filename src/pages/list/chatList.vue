@@ -6,25 +6,9 @@
     <uni-transition :mode-class="['fade','zoom-in']" :show="!loading">
       <view class="chatBox">
         <view class="chatList">
-          <view class="chatitem">
-            <view class="name">稍等方式:</view>
-            <view class="content">短的宝宝感染</view>
-          </view>
-          <view class="chatitem">
-            <view class="name">23fdf反倒是:</view>
-            <view class="content">感豆腐干豆腐干豆腐放仨的宝宝感染</view>
-          </view>
-          <view class="chatitem">
-            <view class="name">sdfv:</view>
-            <view class="content">短发是法国代购防晒服防辐射服咕咚咕咚...</view>
-          </view>
-          <view class="chatitem">
-            <view class="name">sasf搜索:</view>
-            <view class="content">短发是豆腐干豆腐放仨的宝宝感染？？？</view>
-          </view>
-          <view class="chatitem">
-            <view class="name">43453的官方地方:</view>
-            <view class="content">哈哈哈哈😄</view>
+          <view class="chatitem" v-for="(item,index) in data" :key="index">
+            <view class="name">{{item.name}}:</view>
+            <view class="content">{{item.content}}</view>
           </view>
         </view>
         <view class="chatinput">
@@ -36,23 +20,48 @@
 </template>
 
 <script>
-import base64Img from "@/base64/common.json"
+import base64Img from "@/base64/common.json";
+import { uniRequest } from "@/utils/tool.js";
 export default {
+  props: {
+    userInfo: {
+      type: Object,
+      default: null,
+    },
+    orderid: {
+      type: String,
+      default: null,
+    },
+  },
   data() {
     return {
       base64Img,
       loading: true,
       inputValue: "",
+      data: [],
     };
   },
-  created() {
-    setTimeout(() => {
-      this.loading = false;
-    }, 3000);
+  async created() {
+    let data = (await uniRequest("orderOpration/search", "POST", {
+      dbTable: this.userInfo.campus + "_orderchats",
+      param: {
+        orderid: this.orderid
+      }
+    })).data
+    this.data = data
+    this.loading = false
   },
   methods: {
-    sendChat() {
-      console.log("9898value", this.inputValue);
+    async sendChat() {
+      await uniRequest("orderOpration/add", "POST", {
+        dbTable: this.userInfo.campus + "_orderchats",
+        param: {
+          orderid: this.orderid,
+          openid: this.userInfo.openid,
+          name: this.userInfo.nickName,
+          content: this.inputValue,
+        },
+      });
       this.inputValue = "";
     },
   },
