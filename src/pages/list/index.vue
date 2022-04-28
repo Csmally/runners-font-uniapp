@@ -76,15 +76,15 @@
               </view>
               <view class="operationbaritem" @click.stop="comment(item.id)">
                 <image class="operationimg" src="@/static/comment.png" />
-                <view>{{item.chatList.length===0?"写评论":item.chatList.length}}</view>
+                <view>{{item.chatLength===0?"写评论":item.chatLength}}</view>
               </view>
               <view class="operationbaritem" @click.stop="support(item)">
-                <image v-if="item.support===true" class="operationimg heartAnimation" src="@/static/heart.png" />
-                <image v-else class="operationimg" src="@/static/like.png" />
-                <view>234</view>
+                <image v-if="item.likesMap.get(userInfo.openid)" class="operationimg heartAnimation" src="@/static/heart.png" />
+                <image v-else class="operationimg heartAnimation" src="@/static/like.png" />
+                <view>{{item.orderLikesLength}}</view>
               </view>
             </view>
-            <ChatList v-if="showChatBoxId===item.id" :orderid="item.orderid" :userInfo="userInfo" />
+            <ChatList v-if="showChatBoxId===item.id" :orderid="item.orderid" :userInfo="userInfo" @addChat="addChat(item)" />
           </view>
         </view>
       </view>
@@ -146,14 +146,14 @@ export default {
     };
   },
   onLoad() {
-    console.log('9898进来第一页')
+    console.log("9898进来第一页");
   },
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     clearTimeout();
-    if(uni.getStorageSync("isCreateNewOrder")){
-      await this.getData("start")
-      uni.setStorageSync("isCreateNewOrder", false)
+    if (uni.getStorageSync("isCreateNewOrder")) {
+      await this.getData("start");
+      uni.setStorageSync("isCreateNewOrder", false);
     }
   },
   watch: {
@@ -175,11 +175,36 @@ export default {
     comment(id) {
       this.showChatBoxId = id;
     },
-    support(item) {
-      if (item.support) {
-        item.support = false;
+    async support(item) {
+      let flag = item.likesMap.get(this.userInfo.openid);
+      console.log("9898flag", flag);
+      if (flag === true || flag === false) {
+        await uniRequest("orderOpration/update", "POST", {
+          dbTable: this.userInfo.campus + "_orderlikes",
+          searchParams: {
+            orderid: item.orderid,
+            openid: this.userInfo.openid,
+          },
+          updateParams: {
+            status: !flag,
+          },
+        });
+        item.likesMap.set(this.userInfo.openid, !flag);
+        if (flag === true) {
+          item.orderLikesLength = item.orderLikesLength - 1;
+        } else {
+          item.orderLikesLength = item.orderLikesLength + 1;
+        }
       } else {
-        item.support = true;
+        await uniRequest("orderOpration/changeLikes", "POST", {
+          dbTable: this.userInfo.campus + "_orderlikes",
+          param: {
+            orderid: item.orderid,
+            openid: this.userInfo.openid,
+          },
+        });
+        item.likesMap.set(this.userInfo.openid, true);
+        item.orderLikesLength = item.orderLikesLength + 1;
       }
     },
     async getUserList() {
@@ -208,6 +233,7 @@ export default {
       });
     },
     async getData(mark) {
+      this.showChatBoxId = null;
       if (this.userInfo.type === "1") {
         console.log("9898现在是客户模式了11", this.userInfo.campus);
         let resData = await uniRequest("order/search", "POST", {
@@ -219,6 +245,16 @@ export default {
               ? { limit: 10, offset: this.data.length }
               : { limit: 10 },
         });
+        for (const item of resData.data) {
+          item.chatLength = item.chatList.length;
+          item.orderLikesLength = item.orderlikes.length;
+          let likesMap = new Map();
+          for (const item1 of item.orderlikes) {
+            likesMap.set(item1.openid, item1.status);
+          }
+          console.log("9898map", likesMap);
+          item.likesMap = likesMap;
+        }
         if (mark === "bottom") {
           this.data.push(...resData.data);
         } else {
@@ -235,6 +271,16 @@ export default {
           type: "orderMainList",
           otherParam: { limit: 10 },
         });
+        for (const item of resData.data) {
+          item.chatLength = item.chatList.length;
+          item.orderLikesLength = item.orderlikes.length;
+          let likesMap = new Map();
+          for (const item1 of item.orderlikes) {
+            likesMap.set(item1.openid, item1.status);
+          }
+          console.log("9898map", likesMap);
+          item.likesMap = likesMap;
+        }
         this.data = resData.data;
       }
       this.bottomLoadingShow = false;
@@ -304,6 +350,9 @@ export default {
     searchCancel() {
       this.listType = "mainList";
       this.searchFocus = false;
+    },
+    addChat(item) {
+      item.chatLength = item.chatLength + 1;
     },
   },
 };

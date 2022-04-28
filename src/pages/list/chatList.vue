@@ -5,14 +5,15 @@
     </view>
     <uni-transition :mode-class="['fade','zoom-in']" :show="!loading">
       <view class="chatBox">
-        <view class="chatList">
-          <view class="chatitem" v-for="(item,index) in data" :key="index">
-            <view class="name">{{item.name}}:</view>
+        <scroll-view scroll-y :scroll-into-view="showid" class="chatList">
+          <view :class="selectItemId===item.id?'chatitem selectitem':'chatitem'" v-for="(item,index) in data" :key="index" :id="'showid'+index" @click="selectItem(item)">
+            <view v-if="item.toOpenid" class="name">{{item.fromName}}<text style="color: #747474">回复</text>{{item.toName}}:</view>
+            <view class="name" v-else>{{item.fromName}}:</view>
             <view class="content">{{item.content}}</view>
           </view>
-        </view>
+        </scroll-view>
         <view class="chatinput">
-          <input placeholder="评论" v-model="inputValue" confirm-type="send" :cursor-spacing="20" @confirm="sendChat" />
+          <input :placeholder="inputPlaceholder" v-model="inputValue" confirm-type="send" :cursor-spacing="20" @confirm="sendChat" :focus="inputFocus" @keyboardheightchange="keyboardheightchange" />
         </view>
       </view>
     </uni-transition>
@@ -39,30 +40,107 @@ export default {
       loading: true,
       inputValue: "",
       data: [],
+      showid: null,
+      inputFocus: false,
+      inputPlaceholder: "评论",
+      speakType: "main",
+      toObj: null,
+      selectItemId: null,
     };
   },
   async created() {
-    let data = (await uniRequest("orderOpration/search", "POST", {
-      dbTable: this.userInfo.campus + "_orderchats",
-      param: {
-        orderid: this.orderid
-      }
-    })).data
-    this.data = data
-    this.loading = false
+    await this.getData("start");
+    this.loading = false;
   },
   methods: {
+    change(e) {
+      this.show = e.show;
+    },
+    async getData(mark) {
+      let data = (
+        await uniRequest("orderOpration/search", "POST", {
+          dbTable: this.userInfo.campus + "_orderchats",
+          param: {
+            orderid: this.orderid,
+          },
+        })
+      ).data;
+      this.data = data;
+      if (mark === "add") {
+        this.showid = "showid" + (data.length - 1);
+      }
+    },
     async sendChat() {
-      await uniRequest("orderOpration/add", "POST", {
-        dbTable: this.userInfo.campus + "_orderchats",
-        param: {
-          orderid: this.orderid,
-          openid: this.userInfo.openid,
-          name: this.userInfo.nickName,
-          content: this.inputValue,
-        },
-      });
+      if (this.inputValue !== "") {
+        if (this.speakType === "main") {
+          await uniRequest("orderOpration/add", "POST", {
+            dbTable: this.userInfo.campus + "_orderchats",
+            param: {
+              orderid: this.orderid,
+              fromOpenid: this.userInfo.openid,
+              fromName: this.userInfo.nickName,
+              content: this.inputValue,
+            },
+          });
+        } else {
+          await uniRequest("orderOpration/add", "POST", {
+            dbTable: this.userInfo.campus + "_orderchats",
+            param: {
+              orderid: this.orderid,
+              fromOpenid: this.userInfo.openid,
+              fromName: this.userInfo.nickName,
+              toOpenid: this.toObj.toOpenid,
+              toName: this.toObj.toName,
+              content: this.inputValue,
+            },
+          });
+        }
+      }
       this.inputValue = "";
+      this.inputPlaceholder = "评论";
+      this.speakType = "main";
+      this.inputFocus = false;
+      await this.getData("add");
+      this.$emit("addChat");
+    },
+    selectItem(item) {
+      if (this.inputFocus) {
+        console.log("9898什么也不干");
+        this.inputPlaceholder = "评论";
+        this.speakType = "main";
+        this.inputFocus = false;
+        this.inputValue = "";
+      } else {
+        if (item.fromOpenid === this.userInfo.openid) {
+          console.log("9898删除评论", item);
+          this.selectItemId = item.id;
+          uni.showActionSheet({
+            alertText: "删除我的评论",
+            itemList: ["删除"],
+            itemColor: "#ff0000",
+            success: async (res) => {
+              await uniRequest("orderOpration/delete", "POST", {
+                dbTable: this.userInfo.campus + "_orderchats",
+                param: { id: item.id },
+              });
+              this.selectItemId = null
+              this.getData("delete");
+            },
+            fail: () => {
+              this.selectItemId = null
+            },
+          });
+        } else {
+          console.log("9898回复");
+          this.speakType = "back";
+          this.inputPlaceholder = "回复" + item.fromName;
+          this.inputFocus = true;
+          this.toObj = { toOpenid: item.fromOpenid, toName: item.fromName };
+        }
+      }
+    },
+    keyboardheightchange(e) {
+      this.inputFocus = e.detail.height === 0 ? false : true;
     },
   },
 };
@@ -96,6 +174,9 @@ export default {
     transform: rotate(360deg);
   }
 }
+.selectitem {
+  background-color: #f8f8f8;
+}
 .chatBox {
   .chatList {
     max-height: 500rpx;
@@ -107,7 +188,7 @@ export default {
       display: flex;
       .name {
         white-space: nowrap;
-        color: #747474;
+        color: #6f83bf;
         font-weight: bold;
         margin-right: 20rpx;
       }

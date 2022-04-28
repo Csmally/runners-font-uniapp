@@ -39,16 +39,8 @@
       <image class="backgroundImage" src="@/static/test5.jpg" mode="scaleToFill" />
     </view>
     <view class="content">
-      <!-- <ContentInfo /> -->
-      <SegmentedControl :texts="texts" @tabChange="tabChange" :currentTab="currentTab"/>
+      <SegmentedControl :texts="texts" @tabChange="tabChange" :currentTab="currentTab" />
     </view>
-    <!-- 底部弹出 -->
-    <tui-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="isPopupShow" @close="closePopup">
-      <view class="noallow">
-        <p class="p1">由于微信隐私政策原因，若您的性别数据错误，您可以在本页面“编辑资料”中自行修改</p>
-        <p class="p2">（此操作不会影响您的微信资料）</p>
-      </view>
-    </tui-bottom-popup>
   </view>
 </template>
 
@@ -61,9 +53,8 @@ export default {
     return {
       allHeight: null,
       userInfo: null,
-      isPopupShow: false,
       texts: ["关注", "赞赏", "模版", "地址"],
-      currentTab: 0
+      currentTab: 0,
     };
   },
   onLoad() {},
@@ -72,20 +63,26 @@ export default {
     this.userInfo = uni.getStorageSync("userInfo");
     let isFirst = uni.getStorageSync("isFirst");
     if (isFirst) {
-      this.isPopupShow = true;
+      uni.showActionSheet({
+        alertText: "由于微信隐私政策原因，您的性别数据可能有误",
+        itemList: ["查看"],
+        itemColor: "#6f83bf",
+        success: () => {},
+        fail: () => {},
+        complete: () => {
+          uni.setStorageSync("isFirst", false);
+          this.editInfo();
+        },
+      });
     }
   },
   methods: {
-    closePopup() {
-      this.isPopupShow = false;
-      uni.setStorageSync("isFirst", false);
-    },
     editInfo() {
       jumpTo("/pages/self/editInfo");
     },
     tabChange(value) {
-      this.currentTab = value
-    }
+      this.currentTab = value;
+    },
   },
 };
 </script>
@@ -207,11 +204,11 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  .p1{
+  .p1 {
     font-size: 35rpx;
     margin: 0 45rpx;
   }
-  .p2{
+  .p2 {
     margin-top: 50rpx;
     color: #a3a2a2;
   }
