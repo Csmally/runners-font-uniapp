@@ -1,55 +1,59 @@
 <template>
-  <view>
-    <fui-loading v-if="loading" text="加载中. . ." :srcCol="commonBase64.loading"></fui-loading>
-    <tui-toast ref="toast" position="center"></tui-toast>
-    <tui-modal :show="isModalShow" custom padding="20rpx 20rpx 20rpx 20rpx">
-      <fui-radiogroup v-model="campus">
-        <scroll-view scroll-y class="modalcontent">
-          <fui-label v-for="item in campuses" :key="item.code">
-            <fui-listcell :highlight="false">
-              <text>{{ item.name }}</text>
-              <fui-radio :value="item.code" isCheckMark checkMarkColor="#000" scaleRatio="1.8">
-              </fui-radio>
-            </fui-listcell>
-          </fui-label>
-        </scroll-view>
-      </fui-radiogroup>
-      <tui-grid :unlined="true">
-        <tui-grid-item class="grid grid_nomore" :hover="false" :bottomLine="false" :border="false" @click="confirm('nomore')">
-          没有？
-        </tui-grid-item>
-        <tui-grid-item class="grid grid_no" :hover="false" :bottomLine="false" :border="false" @click="confirm('tourist')">
-          游客
-        </tui-grid-item>
-        <tui-grid-item class="grid grid_go" :hover="false" :bottomLine="false" :border="false" @click="confirm('go',campus)">
-          GO!
-        </tui-grid-item>
-      </tui-grid>
-    </tui-modal>
-  </view>
+  <fui-loading v-if="loading" text="加载中. . ." :srcCol="commonBase64.loading"></fui-loading>
+  <tui-toast ref="toast" position="center"></tui-toast>
+  <uni-transition :mode-class="['fade']" :show="isShowLogin">
+    <!-- <div class="banner" :style="`background-image: url(${commonBase64.swiper1})`"> -->
+    <div class="banner" :style="`background-image: url(${commonBase64.logo})`">
+      <view class="coverbox"></view>
+      <uni-transition v-if="showMark==='login'" :mode-class="['fade','zoom-in']" :show="true">
+        <div class="glass">
+          <view class="title">选择社区</view>
+          <view class="selectbox">
+            <view v-for="item in campuses" @click="selectCampus(item.code)" :key="item.code" class="campusitem">
+              <view>{{item.name}}</view>
+              <image v-if="currentCode===item.code" src="@/static/select.png" />
+            </view>
+          </view>
+          <view class="operation">
+            <button size="mini" type="primary" @click="login">
+              <view class="butonstyle">
+                <image src="@/static/weChat.png" />
+                <view class="btntext">微信登录</view>
+              </view>
+            </button>
+          </view>
+        </div>
+      </uni-transition>
+      <uni-transition v-if="showMark==='getPhone'" :mode-class="['fade','zoom-in']" :show="true">
+        <div class="glass">
+          <view class="getphonebox">
+            <view class="title1">绑定手机号</view>
+            <view class="title2">请先绑定手机号再进行此操作</view>
+            <view class="operation">
+              <button size="mini" type="primary" open-type="getPhoneNumber" @getphonenumber="getPhonenumberGo">
+                <view class="butonstyle">
+                  <image src="@/static/weChat.png" />
+                  <view class="btntext">微信用户一键绑定</view>
+                </view>
+              </button>
+            </view>
+          </view>
+        </div>
+      </uni-transition>
+    </div>
+  </uni-transition>
 </template>
 
 <script>
-import { getOpenid, getUserProfile } from "@/utils/login.js";
-import { uniRequest, jumpTo, getFileName, reSetArr } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
+import { getOpenid } from "@/utils/login.js";
+import { uniRequest, jumpTo, getFileName, reSetArr } from "@/utils/tool.js";
 export default {
-  data() {
-    return {
-      commonBase64,
-      addCampusBase64,
-      loading: false,
-      isModalShow: false,
-      campus: null,
-      openid: null,
-    };
-  },
   async onLoad() {
     let myCampuses = await uniRequest("campus/search", "POST");
     reSetArr(this.campuses, myCampuses.data);
   },
   async onShow() {
-    this.loading = true;
     //获取是否新用户
     let openid = await getOpenid();
     this.openid = openid;
@@ -65,80 +69,163 @@ export default {
       });
     } else {
       this.loading = false;
-      this.isModalShow = true;
+      this.isShowLogin = true;
     }
   },
+  data() {
+    return {
+      commonBase64,
+      addCampusBase64,
+      loading: true,
+      isShowLogin: false,
+      currentCode: null,
+      userInfo: null,
+      openid: null,
+      showMark: "login",
+    };
+  },
   methods: {
-    async saveUserInfo(type, value) {
-      let proInfo = await getUserProfile();
-      uni.setStorageSync("isCreateNewOrder", false);
-      let cloudPhotoPath = null;
-      if (proInfo) {
-        let resData = await uniRequest("txCos/saveAvatar", "POST", {
-          folder: "userAvatar/",
-          filePath: proInfo.userInfo.avatarUrl,
-          fileName: getFileName(),
+    selectCampus(code) {
+      this.currentCode = code;
+    },
+    login() {
+      if (this.currentCode) {
+        uni.getUserProfile({
+          desc: "获取信息11",
+          lang: "zh-CN",
+          success: async (res) => {
+            console.log("9898用户信息", res);
+            let resData = await uniRequest("txCos/saveAvatar", "POST", {
+              folder: "userAvatar/",
+              filePath: res.userInfo.avatarUrl,
+              fileName: getFileName(),
+            });
+            let cloudPath = resData.data.cloudPath;
+            let userInfo = {
+              nickName: res.userInfo.nickName,
+              openid: this.openid,
+              gender: "1",
+              avatarUrl: cloudPath,
+            };
+            this.userInfo = userInfo;
+            this.showMark = "getPhone";
+          },
+          fail: (error) => {
+            console.log("9898用户信息失败", error);
+          },
         });
-        cloudPhotoPath = resData.data.Location.replace(
-          "runners-1307290574.cos.ap-beijing.myqcloud.com",
-          "https://static.runners.ink"
-        );
-        let info = {
-          avatarUrl: cloudPhotoPath,
-          gender: "1",
-          nickName: proInfo.userInfo.nickName,
-          openid: this.openid,
-          campus: type == "tourist" ? "" : value,
-          type: type == "tourist" ? "2" : "1",
+      } else {
+        let options = {
+          title: "请先选择runner社区~",
+          imgUrl: addCampusBase64.toastImg,
+          icon: true,
         };
-        uni.setStorageSync("userInfo", info);
-        uni.setStorageSync("isFirst", true);
+        this.$refs.toast.show(options);
+      }
+    },
+    async getPhonenumberGo(e) {
+      if (e.detail.code) {
+        let phone = (
+          await uniRequest("wxApi/getPhoneNumber", "POST", {
+            code: e.detail.code,
+            openid: this.openid,
+          })
+        ).data.phone_info.phoneNumber;
+        let info = {
+          ...this.userInfo,
+          phoneNumber: phone,
+          type: "1",
+          campus: this.currentCode,
+        };
         await uniRequest("userInfo/add", "POST", info);
+        uni.setStorageSync("isFirst", true);
+        uni.setStorageSync("userInfo", info);
         uni.switchTab({
           url: "/pages/self/index",
         });
       } else {
-        return;
-      }
-    },
-    async confirm(type, value) {
-      if (type === "nomore") {
-        jumpTo("/pages/index/addCampus", { openid: this.openid });
-      }
-      if (type === "tourist") {
-        await this.saveUserInfo(type, value);
-      }
-      if (type === "go") {
-        if (value === null) {
-          let options = {
-            title: "请先选择runner社区~",
-            imgUrl: addCampusBase64.toastImg,
-            icon: true,
-          };
-          this.$refs.toast.show(options);
-        } else {
-          await this.saveUserInfo(type, value);
-        }
       }
     },
   },
 };
 </script>
 
-<style scoped>
-.modalcontent {
-  max-height: 500rpx;
+<style lang="scss">
+.banner {
+  width: 100vw;
+  height: 100vh;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  .coverbox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+  }
 }
-.grid {
+.glass {
+  width: 550rpx;
+  padding: 30rpx 15rpx;
+  border-radius: 30rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 5px rgb(156, 156, 156);
+  .title {
+    font-weight: bolder;
+    text-align: center;
+  }
+}
+.selectbox {
+  width: 100%;
+  max-height: 700rpx;
+  overflow: auto;
+}
+.campusitem {
+  height: 70rpx;
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  image {
+    width: 70rpx;
+    height: 70rpx;
+  }
+}
+.operation {
   text-align: center;
+  .butonstyle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image {
+      width: 48rpx;
+      height: 48rpx;
+      margin-right: 10rpx;
+    }
+    .btntext {
+      font-size: 33rpx;
+    }
+  }
 }
-.grid_nomore {
-  color: #552bc7;
-}
-.grid_no {
-  color: #474749;
-}
-.grid_go {
-  color: #000000;
+.getphonebox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .title1 {
+    font-size: 40rpx;
+  }
+  .title2 {
+    color: #f8f8f8;
+    margin: 50rpx;
+  }
 }
 </style>

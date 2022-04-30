@@ -194,23 +194,4 @@ export default {
   border-top-right-radius: 60rpx;
   background-color: #ffffff;
 }
-.noallow {
-  height: 20vh;
-  background-image: url("/static/noAllow.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  .p1 {
-    font-size: 35rpx;
-    margin: 0 45rpx;
-  }
-  .p2 {
-    margin-top: 50rpx;
-    color: #a3a2a2;
-  }
-}
 </style>
