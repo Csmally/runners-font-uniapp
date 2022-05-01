@@ -57,9 +57,9 @@ function pushLoacalChatLog(orderid, type, ctx, item, loaclPath, randomId) {
 function socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath) {
     ctx.socketObj.emit("sendMessage", {
         toopenid:
-            ctx.userInfo.openid === ctx.orderInfo.openid
+            ctx.userInfo.openid === ctx.orderInfo.publisherOpenid
                 ? ctx.orderInfo.runnerOpenid
-                : ctx.orderInfo.openid,
+                : ctx.orderInfo.publisherOpenid,
         msgData: {
             text: cdnPath,
             videoCdnPath: type === "video" ? videoCdnPath : null,

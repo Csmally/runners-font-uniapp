@@ -62,7 +62,7 @@ export default {
       //如果是老用户 返回用户信息，并存到本地
       uni.setStorageSync("isFirst", false);
       uni.setStorageSync("userInfo", userData.data);
-      uni.setStorageSync("isCreateNewOrder", false);
+      uni.setStorageSync("isRefresh", false);
       this.loading = false;
       uni.switchTab({
         url: "/pages/list/index",
@@ -94,6 +94,8 @@ export default {
           desc: "获取信息11",
           lang: "zh-CN",
           success: async (res) => {
+            this.showMark = null
+            this.loading = true
             console.log("9898用户信息", res);
             let resData = await uniRequest("txCos/saveAvatar", "POST", {
               folder: "userAvatar/",
@@ -108,6 +110,7 @@ export default {
               avatarUrl: cloudPath,
             };
             this.userInfo = userInfo;
+            this.loading = false
             this.showMark = "getPhone";
           },
           fail: (error) => {

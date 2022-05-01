@@ -28,7 +28,7 @@
 
             </view>
             <view class="chatleft" v-else>
-              <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.publisherInfo.avatarUrl:orderInfo.runnerInfo.avatarUrl" />
+              <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.runnerInfo.avatarUrl:orderInfo.publisherInfo.avatarUrl" />
               <view v-if="item.msgType==='text'" class="textleft">
                 <view class="speakleft"></view>
                 <view class="chatcontent">

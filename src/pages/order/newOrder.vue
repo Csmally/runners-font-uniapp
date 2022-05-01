@@ -64,7 +64,13 @@
 </template>
 
 <script>
-import { uniRequest, jumpTo, wxPay, uploadFile, getRandomId } from "@/utils/tool.js";
+import {
+  uniRequest,
+  jumpTo,
+  wxPay,
+  uploadFile,
+  getRandomId,
+} from "@/utils/tool.js";
 import { commonBase64, addCampusBase64, orderBase64 } from "@/base64/index.js";
 export default {
   props: {
@@ -73,9 +79,9 @@ export default {
       default: null,
     },
   },
-  onInit() {},
-  onLoad() {},
-  onReady() {},
+  created() {
+    this.form.mobile = this.userInfo.phoneNumber;
+  },
   data() {
     return {
       orderBase64,
@@ -99,7 +105,7 @@ export default {
         { value: "goodsAddress", label: "请输入商品购买地址" },
         { value: "goodsPrice", label: "请输入商品预估价格" },
         { value: "price", label: "请输入酬劳" },
-        { value: "selfAddress", label: "请输入您希望的送达地址" }
+        { value: "selfAddress", label: "请输入您希望的送达地址" },
       ],
       isContentShow: true,
       card: {
@@ -237,12 +243,16 @@ export default {
         if (key === "desc") {
           this.form[key] = "";
         } else {
-          this.form[key] = null;
+          if (key === "mobile") {
+            continue;
+          } else {
+            this.form[key] = null;
+          }
         }
       }
       this.submitLoading = false;
       this.isContentShow = true;
-      uni.setStorageSync("isCreateNewOrder", true)
+      uni.setStorageSync("isRefresh", true);
       jumpTo("/pages/result/index", { title: "发送成功！" });
     },
   },

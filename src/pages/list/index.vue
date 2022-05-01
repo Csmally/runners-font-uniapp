@@ -151,9 +151,9 @@ export default {
   async onShow() {
     this.userInfo = uni.getStorageSync("userInfo");
     clearTimeout();
-    if (uni.getStorageSync("isCreateNewOrder")) {
+    if (uni.getStorageSync("isRefresh")) {
       await this.getData("start");
-      uni.setStorageSync("isCreateNewOrder", false);
+      uni.setStorageSync("isRefresh", false);
     }
   },
   watch: {

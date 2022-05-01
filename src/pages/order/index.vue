@@ -13,7 +13,7 @@
         </view>
       </view>
       <view>
-        <NewOrder v-show="currentTab===0" :userInfo="userInfo" />
+        <NewOrder v-if="currentTab===0" :userInfo="userInfo" />
         <OrderIng v-show="currentTab===1" :userInfo="userInfo" :orderData="orderData" />
         <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderData" />
         <OrderEd v-show="currentTab===3" :userInfo="userInfo" :orderData="orderData" />
@@ -56,6 +56,7 @@ export default {
     console.log('9898进来第二页')
   },
   onShow() {
+    this.currentTab = 1
     this.userInfo = uni.getStorageSync("userInfo");
     if (this.currentTab !== 0) {
       this.getOrderData();
@@ -144,10 +145,12 @@ export default {
       });
       console.log("9898查询结果", resData);
       for (const item of resData.data) {
-        item.lastChat =
-          JSON.parse(item.chatLogs.content).length > 0
-            ? JSON.parse(item.chatLogs.content)[0]
-            : null;
+        let arrChats = JSON.parse(item.chatLogs.content)
+        if(arrChats.length > 0){
+          item.lastChat = arrChats[arrChats.length-1]
+        }else{
+          item.lastChat = null
+        }
       }
       this.orderData = resData.data;
       this.isChanging = false;

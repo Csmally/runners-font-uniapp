@@ -151,6 +151,7 @@ export default {
           param: { id: this.orderInfo.id },
         });
         this.isPopupShow = false;
+        uni.setStorageSync("isRefresh", true);
         jumpTo("/pages/result/index", {
           title: "runner,GO！",
           mark: "chat",
