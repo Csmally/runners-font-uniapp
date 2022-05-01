@@ -67,7 +67,6 @@ export default {
   components: { navigationBar, NavBar },
   onLoad(option) {
     this.orderInfo = JSON.parse(option.orderInfo);
-    console.log('9898看看',this.orderInfo)
     this.userInfo = uni.getStorageSync("userInfo");
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
@@ -83,6 +82,7 @@ export default {
       }
     });
     socketObj.on("onMessage", (data) => {
+      console.log('9898看看谁发的',socketObj.id)
       this.allChatLog.push(data.msgData);
       this.showid = "showid" + (this.allChatLog.length - 1);
     });
@@ -140,7 +140,7 @@ export default {
       uni.chooseMedia({
         success: async (res) => {
           let orderid = this.orderInfo.orderid;
-          chatSendFiles(res, this, orderid);
+          chatSendFiles(res, this, orderid, this.userInfo.campus + "_chatlogs");
         },
       });
     },

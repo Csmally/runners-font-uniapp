@@ -54,8 +54,9 @@ function pushLoacalChatLog(orderid, type, ctx, item, loaclPath, randomId) {
         ctx.loadingMap.set(loaclPath, true);
     }
 }
-function socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath) {
+function socketSendFiles(dbTable, ctx, cdnPath, orderid, type, item, videoCdnPath) {
     ctx.socketObj.emit("sendMessage", {
+        dbTable,
         toopenid:
             ctx.userInfo.openid === ctx.orderInfo.publisherOpenid
                 ? ctx.orderInfo.runnerOpenid
@@ -73,7 +74,7 @@ function socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath) {
         },
     });
 }
-export function chatSendFiles(files, ctx, orderid) {
+export function chatSendFiles(files, ctx, orderid, dbTable) {
     let type = files.type
     for (const item of files.tempFiles) {
         uni.saveFile({
@@ -90,7 +91,7 @@ export function chatSendFiles(files, ctx, orderid) {
                             filePath: item.tempFilePath,
                             folder: "chatLogMedia/",
                         }).then(videoCdnPath => {
-                            socketSendFiles(ctx, cdnPath, orderid, type, item, videoCdnPath)
+                            socketSendFiles(dbTable, ctx, cdnPath, orderid, type, item, videoCdnPath)
                             for (const videoChat of ctx.allChatLog) {
                                 if (videoChat.randomId && videoChat.randomId === randomId) {
                                     videoChat.videoCdnPath = videoCdnPath
@@ -100,7 +101,7 @@ export function chatSendFiles(files, ctx, orderid) {
                             ctx.loadingMap.delete(res.savedFilePath);
                         })
                     } else {
-                        socketSendFiles(ctx, cdnPath, orderid, type, item)
+                        socketSendFiles(dbTable, ctx, cdnPath, orderid, type, item)
                     }
                 })
             },

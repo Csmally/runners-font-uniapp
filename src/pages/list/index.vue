@@ -163,9 +163,6 @@ export default {
     },
   },
   methods: {
-    searchTest() {
-      this.getData("start");
-    },
     award(id) {
       this.clickCoinId = id;
       setTimeout(() => {
