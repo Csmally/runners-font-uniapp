@@ -1,13 +1,13 @@
 <template>
-  <fui-loading v-if="loading" text="加载中. . ." :srcCol="commonBase64.loading"></fui-loading>
+  <fui-loading v-if="loading||imgload===false" text="加载中. . ." :srcCol="commonBase64.loading"></fui-loading>
   <tui-toast ref="toast" position="center"></tui-toast>
-  <uni-transition :mode-class="['fade']" :show="isShowLogin">
+  <uni-transition :mode-class="['fade']" :show="isShowLogin&&imgload">
     <!-- <div class="banner" :style="`background-image: url(${commonBase64.swiper1})`"> -->
     <div class="banner">
       <view class="coverbox"></view>
-      <image class="coverimg" src="https://static.runners.ink/project/2041651476317_.pic_hd.jpg" />
-      <view class="htitle">RunnersPub</view>
-      <uni-transition v-if="showMark==='login'" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
+      <image class="coverimg" src="https://static.runners.ink/project/2041651476317_.pic_hd.jpg" @load="imgload" />
+      <view class="htitle" v-if="backImgLoad">RunnersPub</view>
+      <uni-transition v-if="showMark==='login'&&backImgLoad===true" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
         <div class="glass">
           <view class="title">选择社区</view>
           <view class="selectbox">
@@ -26,7 +26,7 @@
           </view>
         </div>
       </uni-transition>
-      <uni-transition v-if="showMark==='getPhone'" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
+      <uni-transition v-if="showMark==='getPhone'&&backImgLoad===true" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
         <div class="glass">
           <view class="getphonebox">
             <view class="title1">绑定手机号</view>
@@ -84,9 +84,13 @@ export default {
       userInfo: null,
       openid: null,
       showMark: "login",
+      backImgLoad: false,
     };
   },
   methods: {
+    imgload(res) {
+      this.backImgLoad = true;
+    },
     selectCampus(code) {
       this.currentCode = code;
     },
