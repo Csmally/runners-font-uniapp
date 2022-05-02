@@ -3,9 +3,11 @@
   <tui-toast ref="toast" position="center"></tui-toast>
   <uni-transition :mode-class="['fade']" :show="isShowLogin">
     <!-- <div class="banner" :style="`background-image: url(${commonBase64.swiper1})`"> -->
-    <div class="banner" :style="`background-image: url(${commonBase64.logo})`">
+    <div class="banner">
       <view class="coverbox"></view>
-      <uni-transition v-if="showMark==='login'" :mode-class="['fade','zoom-in']" :show="true">
+      <image class="coverimg" src="https://static.runners.ink/project/2041651476317_.pic_hd.jpg" />
+      <view class="htitle">RunnersPub</view>
+      <uni-transition v-if="showMark==='login'" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
         <div class="glass">
           <view class="title">选择社区</view>
           <view class="selectbox">
@@ -24,7 +26,7 @@
           </view>
         </div>
       </uni-transition>
-      <uni-transition v-if="showMark==='getPhone'" :mode-class="['fade','zoom-in']" :show="true">
+      <uni-transition v-if="showMark==='getPhone'" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
         <div class="glass">
           <view class="getphonebox">
             <view class="title1">绑定手机号</view>
@@ -47,7 +49,7 @@
 <script>
 import { commonBase64, addCampusBase64 } from "@/base64/index.js";
 import { getOpenid } from "@/utils/login.js";
-import { uniRequest, jumpTo, getFileName, reSetArr } from "@/utils/tool.js";
+import { uniRequest, getFileName, reSetArr } from "@/utils/tool.js";
 export default {
   async onLoad() {
     let myCampuses = await uniRequest("campus/search", "POST");
@@ -94,8 +96,8 @@ export default {
           desc: "获取信息11",
           lang: "zh-CN",
           success: async (res) => {
-            this.showMark = null
-            this.loading = true
+            this.showMark = null;
+            this.loading = true;
             console.log("9898用户信息", res);
             let resData = await uniRequest("txCos/saveAvatar", "POST", {
               folder: "userAvatar/",
@@ -110,7 +112,7 @@ export default {
               avatarUrl: cloudPath,
             };
             this.userInfo = userInfo;
-            this.loading = false
+            this.loading = false;
             this.showMark = "getPhone";
           },
           fail: (error) => {
@@ -161,18 +163,38 @@ export default {
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
   .coverbox {
+    z-index: 3;
     position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px);
+    background-color: rgba(57, 57, 57, 0.2);
+    backdrop-filter: blur(5px);
   }
+  .coverimg {
+    z-index: 2;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .htitle {
+    z-index: 4;
+    margin-bottom: 35rpx;
+    font-size: 60rpx;
+    font-weight: bolder;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+}
+.loginbox {
+  z-index: 4;
 }
 .glass {
   width: 550rpx;
