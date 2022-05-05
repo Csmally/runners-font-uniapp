@@ -1,12 +1,12 @@
 <template>
   <view class="container">
     <view v-for="item in orderData" :key="item.id" class="chatitem" @click="selectChat(item)">
-      <image v-if="userInfo.openid===item.publisherOpenid" class="avatar" :src="item.runnerInfo.avatarUrl" />
-      <image v-else class="avatar" :src="item.publisherInfo.avatarUrl" />
+      <image v-if="userInfo.openid===item.publisherOpenid" class="avatar" :src="item[userInfo.campus+'runnerInfo'].avatarUrl" />
+      <image v-else class="avatar" :src="item[userInfo.campus+'publisherInfo'].avatarUrl" />
       <view class="nameandinfo">
         <view class="nickname">
-          <view v-if="userInfo.openid===item.publisherOpenid">{{item.runnerInfo.nickName}}</view>
-          <view v-else>{{item.publisherInfo.nickName}}</view>
+          <view v-if="userInfo.openid===item.publisherOpenid">{{item[userInfo.campus+'runnerInfo'].nickName}}</view>
+          <view v-else>{{item[userInfo.campus+'publisherInfo'].nickName}}</view>
         </view>
         <view>
           <view v-if="item.lastChat">

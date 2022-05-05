@@ -3,13 +3,13 @@
     <NavBar mark="home" />
     <view class="chattitle">
       <view class="name" :style="{paddingTop:statusBarHeight}">
-        {{userInfo.openid===orderInfo.publisherOpenid?orderInfo.runnerInfo.nickName:orderInfo.publisherInfo.nickName}}
+        {{userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'runnerInfo'].nickName:orderInfo[userInfo.campus+'publisherInfo'].nickName}}
       </view>
     </view>
     <scroll-view scroll-y :scroll-into-view="showid" :style="'height: '+scrollHeight" class="chatbox" scroll-anchoring :scroll-with-animation="true">
       <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
         <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
-          <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.publisherInfo.avatarUrl:orderInfo.runnerInfo.avatarUrl" />
+          <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'publisherInfo'].avatarUrl:orderInfo[userInfo.campus+'runnerInfo'].avatarUrl" />
           <view v-if="item.msgType==='text'" class="textright">
             <view class="speakright"></view>
             <view class="chatcontent">
@@ -26,7 +26,7 @@
 
         </view>
         <view class="chatleft" v-else>
-          <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo.runnerInfo.avatarUrl:orderInfo.publisherInfo.avatarUrl" />
+          <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'runnerInfo'].avatarUrl:orderInfo[userInfo.campus+'publisherInfo'].avatarUrl" />
           <view v-if="item.msgType==='text'" class="textleft">
             <view class="speakleft"></view>
             <view class="chatcontent">

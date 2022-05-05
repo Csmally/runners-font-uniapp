@@ -69,7 +69,7 @@ import {
   jumpTo,
   wxPay,
   uploadFile,
-  getRandomId,
+  getRandomOrderId,
 } from "@/utils/tool.js";
 import { commonBase64, addCampusBase64, orderBase64 } from "@/base64/index.js";
 export default {
@@ -215,9 +215,11 @@ export default {
           return;
         }
       }
+      let orderid = this.userInfo.campus + getRandomOrderId()
       await wxPay({
         price: Number(this.form.price).toFixed(2),
         openid: this.userInfo.openid,
+        orderid
       });
       let cloudPhotoPath = null;
       if (this.form.localphotos) {
@@ -236,7 +238,7 @@ export default {
         publisherOpenid: this.userInfo.openid,
         dbTable: this.userInfo.campus + "_orders",
         campus: this.userInfo.campus,
-        orderid: this.userInfo.campus + getRandomId(),
+        orderid,
         status: 1,
       });
       for (const key in this.form) {

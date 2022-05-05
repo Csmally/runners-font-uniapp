@@ -30,11 +30,11 @@
             <view class="itemTop">
               <view class="topLeft">
                 <view class="avatar">
-                  <image class="avatarImg" :src="item.publisherInfo.avatarUrl" mode="aspectFit" />
-                  <image v-if="item.publisherInfo.gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
-                  <image v-if="item.publisherInfo.gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
+                  <image class="avatarImg" :src="item[userInfo.campus+'publisherInfo'].avatarUrl" mode="aspectFit" />
+                  <image v-if="item[userInfo.campus+'publisherInfo'].gender==='1'" class="genderImg" src="@/static/man.png" mode="aspectFit" />
+                  <image v-if="item[userInfo.campus+'publisherInfo'].gender==='2'" class="genderImg" src="@/static/woman.png" mode="aspectFit" />
                 </view>
-                <view class="nickName">{{item.publisherInfo.nickName}}</view>
+                <view class="nickName">{{item[userInfo.campus+'publisherInfo'].nickName}}</view>
               </view>
               <view class="topRight">
                 <view class="followin">关注</view>
@@ -322,7 +322,7 @@ export default {
         console.log("9898item", item);
         jumpTo("/pages/list/moreInfo", {
           ...item,
-          publisherInfo: JSON.stringify(item.publisherInfo),
+          publisherInfo: JSON.stringify(item[this.userInfo.campus+'publisherInfo']),
         });
       } else {
         let options = {

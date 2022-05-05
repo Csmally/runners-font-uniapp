@@ -57,19 +57,30 @@ export default {
   },
   async onShow() {
     //获取是否新用户
-    let openid = await getOpenid();
-    this.openid = openid;
-    let userData = await uniRequest("userInfo/search", "POST", { openid });
+    let loginData = await getOpenid();
+    this.openid = loginData.openid;
+    this.unionid = loginData.unionid;
+    let userData = await uniRequest("userInfo/search", "POST", {
+      unionid: this.unionid,
+    });
+    console.log("9898数据库存的", userData);
     if (userData.data) {
-      //如果是老用户 返回用户信息，并存到本地
-      uni.setStorageSync("isFirst", false);
-      uni.setStorageSync("userInfo", userData.data);
-      uni.setStorageSync("isRefresh", false);
-      this.loading = false;
-      uni.switchTab({
-        url: "/pages/list/index",
-      });
+      if (userData.data.openid) {
+        //如果是老用户 返回用户信息，并存到本地
+        uni.setStorageSync("isFirst", false);
+        uni.setStorageSync("userInfo", userData.data);
+        uni.setStorageSync("isRefresh", false);
+        this.loading = false;
+        uni.switchTab({
+          url: "/pages/list/index",
+        });
+      } else {
+        this.mark = "edit";
+        this.loading = false;
+        this.isShowLogin = true;
+      }
     } else {
+      this.mark = "add";
       this.loading = false;
       this.isShowLogin = true;
     }
@@ -83,8 +94,10 @@ export default {
       currentCode: null,
       userInfo: null,
       openid: null,
+      unionid: null,
       showMark: "login",
       backImgLoad: false,
+      mark: null,
     };
   },
   methods: {
@@ -97,7 +110,7 @@ export default {
     login() {
       if (this.currentCode) {
         uni.getUserProfile({
-          desc: "获取信息11",
+          desc: "获取信息",
           lang: "zh-CN",
           success: async (res) => {
             this.showMark = null;
@@ -112,6 +125,7 @@ export default {
             let userInfo = {
               nickName: res.userInfo.nickName,
               openid: this.openid,
+              unionid: this.unionid,
               gender: "1",
               avatarUrl: cloudPath,
             };
@@ -146,7 +160,15 @@ export default {
           type: "1",
           campus: this.currentCode,
         };
-        await uniRequest("userInfo/add", "POST", info);
+        if (this.mark === "add") {
+          await uniRequest("userInfo/add", "POST", info);
+        } else {
+
+          await uniRequest("userInfo/update", "POST", {
+            searchParams: { unionid: this.unionid },
+            updateParams: info,
+          });
+        }
         uni.setStorageSync("isFirst", true);
         uni.setStorageSync("userInfo", info);
         uni.switchTab({

@@ -13,10 +13,10 @@
         </view>
       </view>
       <view>
-        <NewOrder v-if="currentTab===0" :userInfo="userInfo" />
-        <OrderIng v-show="currentTab===1" :userInfo="userInfo" :orderData="orderData" />
-        <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderData" />
-        <OrderEd v-show="currentTab===3" :userInfo="userInfo" :orderData="orderData" />
+        <NewOrder v-show="currentTab===0" :userInfo="userInfo" />
+        <OrderIng v-show="currentTab===1" :userInfo="userInfo" :orderData="orderDataIng" />
+        <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderDataSelf" />
+        <OrderEd v-show="currentTab===3" :userInfo="userInfo" :orderData="orderDataEd" />
       </view>
     </view>
   </view>
@@ -46,7 +46,11 @@ export default {
       currentTab: 1,
       texts: ["去下单", "进行中", "我发出", "已完成"],
       userInfo: null,
-      orderData: [],
+
+      orderDataIng: [],
+      orderDataSelf: [],
+      orderDataEd: [],
+
       typeIndex: 0,
       typeText: ["全部", "我发出的", "我接收的"],
       isChanging: false,
@@ -143,16 +147,25 @@ export default {
         dbTable: this.userInfo.campus,
         param,
       });
-      console.log("9898查询结果", resData);
       for (const item of resData.data) {
-        let arrChats = JSON.parse(item.chatLogs.content)
-        if(arrChats.length > 0){
-          item.lastChat = arrChats[arrChats.length-1]
-        }else{
-          item.lastChat = null
+        if(item.chatLogs){
+          let arrChats = JSON.parse(item.chatLogs.content)
+          if(arrChats.length > 0){
+            item.lastChat = arrChats[arrChats.length-1]
+          }else{
+            item.lastChat = null
+          }
         }
       }
-      this.orderData = resData.data;
+      if(this.currentTab === 1){
+        this.orderDataIng = resData.data;
+      }
+      if(this.currentTab === 2){
+        this.orderDataSelf = resData.data;
+      }
+      if(this.currentTab === 3){
+        this.orderDataEd = resData.data;
+      }
       this.isChanging = false;
     },
   },

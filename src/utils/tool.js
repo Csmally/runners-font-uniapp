@@ -170,6 +170,11 @@ export function jumpTo(url, param) {
         });
     }
 }
+
+export function getRandomOrderId() {
+    return (Math.random() * 10000000).toString(16).substr(0, 4) + (new Date()).getTime()
+}
+
 export function getRandomId() {
     return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + (Math.random() * 1000000000).toString().substr(0, 8)
 }

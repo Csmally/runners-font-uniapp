@@ -16,7 +16,7 @@ export function getOpenid() {
                     data: data,
                     method: 'POST',
                     success: (res1) => {
-                        resolve(res1.data.data.openid)
+                        resolve(res1.data.data)
                     },
                     fail: (error) => {
                         reject(error)

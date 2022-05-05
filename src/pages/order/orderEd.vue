@@ -3,7 +3,7 @@
     <view class="contentitem" v-for="item in orderData" :key="item.id">
       <view class="title">
         <view class="info">
-          <image v-if="item.status===3" :src="item.publisherOpenid===userInfo.openid?item.runnerInfo.avatarUrl:item.publisherInfo.avatarUrl" />
+          <image v-if="item.status===3" :src="item.publisherOpenid===userInfo.openid?item[userInfo.campus+'runnerInfo'].avatarUrl:item[userInfo.campus+'publisherInfo'].avatarUrl" />
           <view class="titletext">{{item.goodsName}}</view>
         </view>
         <view style="color: #a19f9f">{{item.status===3?"已完成":"已取消"}}</view>
