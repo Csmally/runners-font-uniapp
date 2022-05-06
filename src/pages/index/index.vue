@@ -5,7 +5,7 @@
     <!-- <div class="banner" :style="`background-image: url(${commonBase64.swiper1})`"> -->
     <div class="banner">
       <view class="coverbox"></view>
-      <image class="coverimg" src="https://static.runners.ink/project/2041651476317_.pic_hd.jpg" @load="imgload" />
+      <image class="coverimg" src="https://static.runners.ink/project/WechatIMG235.jpeg" @load="imgload" />
       <view class="htitle" v-if="backImgLoad">RunnersPub</view>
       <uni-transition v-if="showMark==='login'&&backImgLoad===true" class="loginbox" :mode-class="['fade','zoom-in']" :show="true">
         <div class="glass">
@@ -64,7 +64,7 @@ export default {
       unionid: this.unionid,
     });
     console.log("9898数据库存的", userData);
-    if (userData.data) {
+    if (userData.data===9) {
       if (userData.data.openid) {
         //如果是老用户 返回用户信息，并存到本地
         uni.setStorageSync("isFirst", false);

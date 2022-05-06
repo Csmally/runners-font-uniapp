@@ -51,6 +51,10 @@ export default {
 <style>
 /*每个页面公共css */
 @import "./fui.scss";
+@font-face {
+  font-family: "dirtyBoy";
+  src: url("./bb.ttf") format("truetype");
+}
 page {
 }
 .hiddenText {

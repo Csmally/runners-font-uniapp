@@ -1,44 +1,43 @@
 <template>
-  <view class="aa">
-    <button @click="test1">获取现在db</button>
-    <button @click="test2">新建表</button>
+  <view class="container">
+    <view class="box">
+
+    </view>
   </view>
 </template>
 
 <script>
-import { uniRequest, getFileName, reSetArr } from "@/utils/tool.js";
+import { commonBase64 } from "@/base64/index.js";
 export default {
   data() {
     return {
-        test3: this.test4()
+      commonBase64,
     };
   },
-  methods: {
-    async test1() {
-      let aa = await uniRequest("order/models", "GET");
-      console.log("9898现在的DB", aa);
-    },
-    async test2() {
-      let aa = await uniRequest("campus/add", "POST",{
-          name: "清华大学",
-          address: "北京市-北京市-海淀区",
-          code: "qinghua"
-      });
-      console.log("9898新建DB", aa);
-    },
-    test4() {
-      let aa = 0;
-      return () => {
-          aa++
-          console.log('9898啥',aa)
-      };
-    },
-  },
+  methods: {},
 };
 </script>
 
 <style>
-.aa {
-  padding-top: 250rpx;
+.container {
+  width: 100vw;
+  height: 100vh;
+  /* background-image: url("https://static.runners.ink/project/cool-background%20%284%29%20%281%29.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover; */
+  background-color: #e6e6e6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.box {
+  /* background-color: #f1f1f1; */
+  height: 200rpx;
+  width: 550rpx;
+  border-radius: 30rpx;
+  background: #e6e6e6;
+  /* border: 15rpx inset #a4a4a4; */
+  box-shadow: inset 13rpx 13rpx 10rpx 10rpx #a4a4a4, inset -13rpx -13rpx 10rpx 10rpx #ffffff;
 }
 </style>
