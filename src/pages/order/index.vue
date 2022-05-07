@@ -60,7 +60,6 @@ export default {
     console.log('9898进来第二页')
   },
   onShow() {
-    this.currentTab = 1
     this.userInfo = uni.getStorageSync("userInfo");
     if (this.currentTab !== 0) {
       this.getOrderData();

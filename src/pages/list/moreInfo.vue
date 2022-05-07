@@ -88,7 +88,7 @@
           </view>
         </view>
       </view>
-      <fui-button v-if="orderInfo.publisherOpenid===userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
+      <fui-button v-if="orderInfo.publisherOpenid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
     </view>
   </view>
 </template>
