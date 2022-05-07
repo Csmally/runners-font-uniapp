@@ -231,67 +231,40 @@ export default {
     },
     async getData(mark) {
       this.showChatBoxId = null;
-      if (this.userInfo.type === "1") {
-        console.log("9898现在是客户模式了11", this.userInfo.campus);
-        let resData = await uniRequest("order/search", "POST", {
-          dbTable: this.userInfo.campus,
-          param: { status: 1 },
-          type: "orderMainList",
-          otherParam:
-            mark === "bottom"
-              ? { limit: 10, offset: this.data.length }
-              : { limit: 10 },
-        });
-        for (const item of resData.data) {
-          item.chatLength = item.chatList.length;
-          item.orderLikesLength = item.orderlikes.length;
-          let likesMap = new Map();
-          for (const item1 of item.orderlikes) {
-            likesMap.set(item1.openid, item1.status);
-          }
-          console.log("9898map", likesMap);
-          item.likesMap = likesMap;
+      let resData = await uniRequest("order/search", "POST", {
+        dbTable: this.userInfo.campus,
+        param: { status: 1 },
+        type: "orderMainList",
+        otherParam:
+          mark === "bottom"
+            ? { limit: 10, offset: this.data.length }
+            : { limit: 10 },
+      });
+      for (const item of resData.data) {
+        item.chatLength = item.chatList.length;
+        item.orderLikesLength = item.orderlikes.length;
+        let likesMap = new Map();
+        for (const item1 of item.orderlikes) {
+          likesMap.set(item1.openid, item1.status);
         }
-        if (mark === "bottom") {
-          this.data.push(...resData.data);
-        } else {
-          this.data = resData.data;
-        }
-        if (resData.data.length === 0) {
-          this.noMore = true;
-        }
+        item.likesMap = likesMap;
+      }
+      if (mark === "bottom") {
+        this.data.push(...resData.data);
       } else {
-        console.log("9898游客模式下只显示十条数据");
-        let resData = await uniRequest("order/search", "POST", {
-          dbTable: "qinghua",
-          param: { status: 1 },
-          type: "orderMainList",
-          otherParam: { limit: 10 },
-        });
-        for (const item of resData.data) {
-          item.chatLength = item.chatList.length;
-          item.orderLikesLength = item.orderlikes.length;
-          let likesMap = new Map();
-          for (const item1 of item.orderlikes) {
-            likesMap.set(item1.openid, item1.status);
-          }
-          console.log("9898map", likesMap);
-          item.likesMap = likesMap;
-        }
         this.data = resData.data;
+      }
+      if (resData.data.length === 0) {
+        this.noMore = true;
       }
       this.bottomLoadingShow = false;
     },
     changeCampus() {
-      if (this.userInfo.type === "1") {
-        for (const item of this.campuses) {
-          if (this.userInfo.campus === item.code) {
-            this.userCampus = item.name;
-            break;
-          }
+      for (const item of this.campuses) {
+        if (this.userInfo.campus === item.code) {
+          this.userCampus = item.name;
+          break;
         }
-      } else {
-        this.userCampus = "游客模式";
       }
     },
     swiperChange(e) {
@@ -322,7 +295,9 @@ export default {
         console.log("9898item", item);
         jumpTo("/pages/list/moreInfo", {
           ...item,
-          publisherInfo: JSON.stringify(item[this.userInfo.campus+'publisherInfo']),
+          publisherInfo: JSON.stringify(
+            item[this.userInfo.campus + "publisherInfo"]
+          ),
         });
       } else {
         let options = {
