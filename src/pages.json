@@ -16,7 +16,7 @@
         {
             "path": "pages/list/index",
             "style": {
-                "navigationBarTitleText": "Runners"
+                "navigationBarTitleText": "RunnersPub"
             }
         },
         {
@@ -58,6 +58,12 @@
         },
         {
             "path": "pages/chooseCampus/index",
+            "style": {
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/servicePages/rule",
             "style": {
                 "navigationStyle": "custom"
             }

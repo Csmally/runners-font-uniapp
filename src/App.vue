@@ -5,7 +5,7 @@ import { getOpenid } from "@/utils/login.js";
 export default {
   onLaunch: async function () {
     const host = import.meta.env.VITE_SOCKET;
-    let openid = await getOpenid();
+    let openid = (await getOpenid()).openid;
     const socket = io(host, {
       query: {},
       transports: ["websocket", "polling"],

@@ -88,17 +88,8 @@
           </view>
         </view>
       </view>
-      <fui-button v-if="orderInfo.publisherOpenid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
+      <fui-button v-if="orderInfo.publisherOpenid===userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
     </view>
-    <tui-bottom-popup :zIndex="1002" :maskZIndex="1001" :show="isPopupShow" @close="closePopup">
-      <view class="popupCampus">
-        <view class="popuptext">确定开始此订单吗？</view>
-        <view class="popupbtncontent">
-          <fui-button class="popupbtn" width="70%" background="#FFFFFF" color="#000000" @click="closePopup">取消</fui-button>
-          <fui-button class="popupbtn" width="70%" background="#000000" color="#FFFFFF" @click="okPopup">确定</fui-button>
-        </view>
-      </view>
-    </tui-bottom-popup>
   </view>
 </template>
 <script>
@@ -109,7 +100,7 @@ export default {
   onLoad(option) {
     this.userInfo = uni.getStorageSync("userInfo");
     let orderInfo = JSON.parse(JSON.stringify(option));
-    orderInfo.publisherInfo = JSON.parse(orderInfo.publisherInfo)
+    orderInfo.publisherInfo = JSON.parse(orderInfo.publisherInfo);
     for (const key in orderInfo) {
       if (orderInfo[key] === "null") {
         orderInfo[key] = null;
@@ -125,46 +116,64 @@ export default {
       orderInfo: null,
       userInfo: null,
       allHeight: null,
-      isPopupShow: null,
     };
   },
   methods: {
-    closePopup() {
-      this.isPopupShow = false;
-    },
     startOrder() {
-      this.isPopupShow = true;
+      uni.showActionSheet({
+        alertText: "开始完成此订单？",
+        itemList: ["开始"],
+        itemColor: "#1a94bc",
+        success: this.okPopup,
+        fail: () => {},
+      });
     },
     async okPopup() {
-      let resData = await uniRequest("order/update", "POST", {
-        dbTable: this.orderInfo.campus + "_orders",
-        searchParams: { id: this.orderInfo.id, status: "1" },
-        updateParams: {
-          runnerOpenid: this.userInfo.openid,
-          status: "2",
-        },
+      let userData = await uniRequest("userInfo/search", "POST", {
+        unionid: this.userInfo.unionid,
       });
-      if (resData.code === 1) {
-        let searData = await uniRequest("order/search", "POST", {
-          type: "orderPageList",
-          dbTable: this.orderInfo.campus,
-          param: { id: this.orderInfo.id },
+      uni.setStorageSync("userInfo", userData.data);
+      console.log("9898用户信息", userData);
+      if (userData.serviceOpenid) {
+        let resData = await uniRequest("order/update", "POST", {
+          dbTable: this.orderInfo.campus + "_orders",
+          searchParams: { id: this.orderInfo.id, status: "1" },
+          updateParams: {
+            runnerOpenid: this.userInfo.openid,
+            status: "2",
+          },
         });
-        this.isPopupShow = false;
-        uni.setStorageSync("isRefresh", true);
-        jumpTo("/pages/result/index", {
-          title: "runner,GO！",
-          mark: "chat",
-          timer: true,
-          orderInfo: JSON.stringify(searData.data[0])
-        });
+        if (resData.code === 1) {
+          let searData = await uniRequest("order/search", "POST", {
+            type: "orderPageList",
+            dbTable: this.orderInfo.campus,
+            param: { id: this.orderInfo.id },
+          });
+          uni.setStorageSync("isRefresh", true);
+          jumpTo("/pages/result/index", {
+            title: "runner,GO！",
+            mark: "chat",
+            timer: true,
+            orderInfo: JSON.stringify(searData.data[0]),
+          });
+        } else {
+          let options = {
+            title: "可惜了，手速慢了一丢丢，换个订单继续吧～",
+            duration: 2500,
+          };
+          this.$refs.toast.show(options);
+          uni.setStorageSync("isRefresh", true);
+        }
       } else {
-        let options = {
-          title: "可惜了，手速慢了一丢丢，换个订单继续吧～",
-          duration: 2500,
-        };
-        this.$refs.toast.show(options);
-        this.isPopupShow = false;
+        uni.showActionSheet({
+          alertText: "您需要先查看RunnersPub接单规则",
+          itemList: ["查看"],
+          itemColor: "#1a94bc",
+          success: () => {
+            jumpTo("/pages/servicePages/rule");
+          },
+          fail: () => {},
+        });
       }
     },
     previewImage(src) {

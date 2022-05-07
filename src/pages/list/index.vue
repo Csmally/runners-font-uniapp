@@ -1,6 +1,6 @@
 <template>
   <tui-toast ref="toast" position="center"></tui-toast>
-  <!-- <button @click="getUserList">获取公众号用户列表</button> -->
+  <!-- <button @click="test">测试</button> -->
   <!-- 主list页面 -->
   <uni-transition mode-class="fade" :show="this.userInfo&&listType==='mainList'">
     <scroll-view class="mainScrollView" refresher-default-style="none" enable-back-to-top lower-threshold="0" @scrolltolower="scrolltolower" refresher-enabled :refresher-triggered="topRefresh" @refresherrefresh="scrollTop" scroll-y>
@@ -163,6 +163,32 @@ export default {
     },
   },
   methods: {
+    async test() {
+      let data = await uniRequest("wxApi/getServiceUserInfo", "POST",{
+        serviceOpenid: "oZwN-6Wuzd4heeBT54mdHUqnMSoI"
+      })
+      console.log('9898data',data)
+    },
+    test1() {
+      switch("aa") {
+        case "bb": {
+          console.log('989811')
+          break
+        }
+        case "aa": {
+          console.log('989822')
+          break
+        }
+        case "cc": {
+          console.log('989833')
+          break
+        }
+        case "aa": {
+          console.log('989844')
+          break
+        }
+      }
+    },
     award(id) {
       this.clickCoinId = id;
       setTimeout(() => {
@@ -203,10 +229,6 @@ export default {
         item.likesMap.set(this.userInfo.openid, true);
         item.orderLikesLength = item.orderLikesLength + 1;
       }
-    },
-    async getUserList() {
-      let ii = await uniRequest("wxApi/getServiceUsers", "POST");
-      console.log("9898公众号用户列表", ii);
     },
     async testSearch() {
       let data = await uniRequest("order/search", "POST", {
