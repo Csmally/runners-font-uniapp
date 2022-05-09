@@ -6,9 +6,9 @@
     <view class="content" v-if="orderInfo">
       <view class="top">
         <view class="avatar">
-          <image class="genderImg" v-if="orderInfo.publisherInfo.gender==='1'" src="@/static/man.png" mode="aspectFit" />
-          <image class="genderImg" v-if="orderInfo.publisherInfo.gender==='2'" src="@/static/woman.png" mode="aspectFit" />
-          <image :src="orderInfo.publisherInfo.avatarUrl" class="avatarimg" />
+          <image class="genderImg" v-if="orderInfo[userInfo.campus+'publisherInfo'].gender==='1'" src="@/static/man.png" mode="aspectFit" />
+          <image class="genderImg" v-if="orderInfo[userInfo.campus+'publisherInfo'].gender==='2'" src="@/static/woman.png" mode="aspectFit" />
+          <image :src="orderInfo[userInfo.campus+'publisherInfo'].avatarUrl" class="avatarimg" />
         </view>
       </view>
       <view class="middle">
@@ -99,8 +99,12 @@ export default {
   components: { NavBar },
   onLoad(option) {
     this.userInfo = uni.getStorageSync("userInfo");
-    let orderInfo = JSON.parse(JSON.stringify(option));
-    orderInfo.publisherInfo = JSON.parse(orderInfo.publisherInfo);
+    let orderInfo = JSON.parse(option.orderInfo);
+    let socketObj = getApp().globalData.socketObj;
+    socketObj.on("orderChange", (data) => {
+      console.log("9898socketzhi", data);
+    });
+    this.socketObj = socketObj;
     for (const key in orderInfo) {
       if (orderInfo[key] === "null") {
         orderInfo[key] = null;
@@ -116,6 +120,7 @@ export default {
       orderInfo: null,
       userInfo: null,
       allHeight: null,
+      socketObj: null,
     };
   },
   methods: {
@@ -147,6 +152,21 @@ export default {
             type: "orderPageList",
             dbTable: this.orderInfo.campus,
             param: { id: this.orderInfo.id },
+          });
+          this.socketObj.emit("orderChange", {
+            type: "getOrder",
+            publisherOpenid: this.orderInfo.publisherOpenid,
+            runnerOpenid: this.userInfo.openid,
+            publisherServiceOpenid:
+              this.orderInfo[this.userInfo.campus + "publisherInfo"]
+                .serviceOpenid,
+            runnerServiceOpenid: this.userInfo.serviceOpenid,
+            orderid: this.orderInfo.orderid,
+            template_id: "aHNvFTosIRELRkr3-EB7Fs_-8Tvr8It2rHix485TkJw",
+            orderid: this.orderInfo.orderid,
+            goodsName: this.orderInfo.goodsName,
+            price: this.orderInfo.price,
+            runnerName: this.userInfo.nickName,
           });
           uni.setStorageSync("isRefresh", true);
           jumpTo("/pages/result/index", {

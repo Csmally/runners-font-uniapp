@@ -104,7 +104,6 @@ export default {
           success: async (res) => {
             this.showMark = null;
             this.loading = true;
-            console.log("9898用户信息", res);
             let resData = await uniRequest("txCos/saveAvatar", "POST", {
               folder: "userAvatar/",
               filePath: res.userInfo.avatarUrl,

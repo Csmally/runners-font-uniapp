@@ -164,28 +164,28 @@ export default {
   },
   methods: {
     async test() {
-      let data = await uniRequest("wxApi/getServiceUserInfo", "POST",{
-        serviceOpenid: "oZwN-6Wuzd4heeBT54mdHUqnMSoI"
-      })
-      console.log('9898data',data)
+      let data = await uniRequest("wxApi/getServiceUserInfo", "POST", {
+        serviceOpenid: "oZwN-6Wuzd4heeBT54mdHUqnMSoI",
+      });
+      console.log("9898data", data);
     },
     test1() {
-      switch("aa") {
+      switch ("aa") {
         case "bb": {
-          console.log('989811')
-          break
+          console.log("989811");
+          break;
         }
         case "aa": {
-          console.log('989822')
-          break
+          console.log("989822");
+          break;
         }
         case "cc": {
-          console.log('989833')
-          break
+          console.log("989833");
+          break;
         }
         case "aa": {
-          console.log('989844')
-          break
+          console.log("989844");
+          break;
         }
       }
     },
@@ -315,12 +315,7 @@ export default {
     selectItem(item) {
       if (this.userInfo.type === "1") {
         console.log("9898item", item);
-        jumpTo("/pages/list/moreInfo", {
-          ...item,
-          publisherInfo: JSON.stringify(
-            item[this.userInfo.campus + "publisherInfo"]
-          ),
-        });
+        jumpTo("/pages/list/moreInfo", { orderInfo: JSON.stringify(item) });
       } else {
         let options = {
           title: "游客模式下暂时无法查看更多",
