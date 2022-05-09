@@ -1,9 +1,5 @@
 <template>
   <view class="container">
-    <!-- <button @click="dianji">点击</button> -->
-    <!-- <uni-transition :show="show" mode-class="fade">
-      <view>动画测试</view>
-    </uni-transition> -->
     <view class="contentitem" v-for="item in orderData" :key="item.id">
       <view class="title">
         <view class="titleleft">{{item.goodsName}}</view>
@@ -65,7 +61,7 @@ export default {
     border-radius: 15rpx;
     margin: 25rpx 20rpx;
     padding: 20rpx;
-    box-shadow: 0rpx 0rpx 10rpx 10rpx #d3d3d3;
+    box-shadow: 0rpx 0rpx 10rpx 10rpx #dedede;
     .title {
       display: flex;
       justify-content: space-between;

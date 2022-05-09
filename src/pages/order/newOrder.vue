@@ -204,58 +204,74 @@ export default {
       console.log("上传失败：", e);
     },
     async submit() {
-      for (const item of this.tips) {
-        if (!this.form[item.value]) {
-          let options = {
-            title: item.label,
-            imgUrl: commonBase64.warn,
-            icon: true,
-          };
-          this.$refs.toast.show(options);
-          return;
-        }
-      }
-      let orderid = this.userInfo.campus + getRandomOrderId()
-      await wxPay({
-        price: Number(this.form.price).toFixed(2),
-        openid: this.userInfo.openid,
-        orderid
+      let userData = await uniRequest("userInfo/search", "POST", {
+        unionid: this.userInfo.unionid,
       });
-      let cloudPhotoPath = null;
-      if (this.form.localphotos) {
-        cloudPhotoPath = await uploadFile({
-          filePath: this.form.localphotos.path,
-          folder: "descImg/",
-        });
-      }
-      this.isContentShow = false;
-      this.submitLoading = true;
-      await uniRequest("order/add", "POST", {
-        ...this.form,
-        photos: cloudPhotoPath,
-        goodsPrice: Number(this.form.goodsPrice).toFixed(2),
-        price: Number(this.form.price).toFixed(2),
-        publisherOpenid: this.userInfo.openid,
-        dbTable: this.userInfo.campus + "_orders",
-        campus: this.userInfo.campus,
-        orderid,
-        status: 1,
-      });
-      for (const key in this.form) {
-        if (key === "desc") {
-          this.form[key] = "";
-        } else {
-          if (key === "mobile") {
-            continue;
-          } else {
-            this.form[key] = null;
+      uni.setStorageSync("userInfo", userData.data);
+      if (userData.data.serviceOpenid) {
+        for (const item of this.tips) {
+          if (!this.form[item.value]) {
+            let options = {
+              title: item.label,
+              imgUrl: commonBase64.warn,
+              icon: true,
+            };
+            this.$refs.toast.show(options);
+            return;
           }
         }
+        let orderid = this.userInfo.campus + getRandomOrderId();
+        await wxPay({
+          price: Number(this.form.price).toFixed(2),
+          openid: this.userInfo.openid,
+          orderid,
+        });
+        let cloudPhotoPath = null;
+        if (this.form.localphotos) {
+          cloudPhotoPath = await uploadFile({
+            filePath: this.form.localphotos.path,
+            folder: "descImg/",
+          });
+        }
+        this.isContentShow = false;
+        this.submitLoading = true;
+        await uniRequest("order/add", "POST", {
+          ...this.form,
+          photos: cloudPhotoPath,
+          goodsPrice: Number(this.form.goodsPrice).toFixed(2),
+          price: Number(this.form.price).toFixed(2),
+          publisherOpenid: this.userInfo.openid,
+          dbTable: this.userInfo.campus + "_orders",
+          campus: this.userInfo.campus,
+          orderid,
+          status: 1,
+        });
+        for (const key in this.form) {
+          if (key === "desc") {
+            this.form[key] = "";
+          } else {
+            if (key === "mobile") {
+              continue;
+            } else {
+              this.form[key] = null;
+            }
+          }
+        }
+        this.submitLoading = false;
+        this.isContentShow = true;
+        uni.setStorageSync("isRefresh", true);
+        jumpTo("/pages/result/index", { title: "发送成功！" });
+      } else {
+        uni.showActionSheet({
+          alertText: "您需要先查看RunnersPub下单规则",
+          itemList: ["查看"],
+          itemColor: "#1a94bc",
+          success: () => {
+            jumpTo("/pages/servicePages/rule");
+          },
+          fail: () => {},
+        });
       }
-      this.submitLoading = false;
-      this.isContentShow = true;
-      uni.setStorageSync("isRefresh", true);
-      jumpTo("/pages/result/index", { title: "发送成功！" });
     },
   },
 };

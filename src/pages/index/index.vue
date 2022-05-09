@@ -313,7 +313,9 @@ export default {
   margin-top: 50rpx;
   padding: 30rpx 15rpx;
   border-radius: 30rpx;
-  background: rgba(236, 240, 243, 0.5);
+  // background: rgba(236, 240, 243, 0.5);
+  background: rgba($color: #ffffff, $alpha: 0.2);
+  backdrop-filter: blur(10rpx);
   box-shadow: 14rpx 14rpx 20rpx rgba($color: #cbced1, $alpha: 0.5),
     -14rpx -14rpx 20rpx rgba($color: #ffffff, $alpha: 0.5);
   .logincontent {
@@ -326,8 +328,8 @@ export default {
       letter-spacing: 10rpx;
       padding: 15rpx 30rpx;
       border-radius: 10rpx;
-      box-shadow: 7rpx 7rpx 10rpx rgba($color: #cbced1, $alpha: 0.5),
-        -7rpx -7rpx 10rpx rgba($color: #ffffff, $alpha: 0.5);
+      // box-shadow: 7rpx 7rpx 10rpx rgba($color: #cbced1, $alpha: 0.5),
+      //   -7rpx -7rpx 10rpx rgba($color: #ffffff, $alpha: 0.5);
     }
     .title1 {
       color: #475164;

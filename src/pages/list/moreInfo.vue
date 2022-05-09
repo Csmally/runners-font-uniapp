@@ -133,8 +133,7 @@ export default {
         unionid: this.userInfo.unionid,
       });
       uni.setStorageSync("userInfo", userData.data);
-      console.log("9898用户信息", userData);
-      if (userData.serviceOpenid) {
+      if (userData.data.serviceOpenid) {
         let resData = await uniRequest("order/update", "POST", {
           dbTable: this.orderInfo.campus + "_orders",
           searchParams: { id: this.orderInfo.id, status: "1" },
