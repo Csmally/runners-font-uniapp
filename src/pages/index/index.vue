@@ -313,16 +313,16 @@ export default {
   padding: 30rpx 15rpx;
   border-radius: 30rpx;
   // background: rgba(236, 240, 243, 0.5);
-  background: rgba($color: #ffffff, $alpha: 0.2);
+  background: rgba($color: #8e8e8e, $alpha: 0.2);
   backdrop-filter: blur(10rpx);
-  box-shadow: 14rpx 14rpx 20rpx rgba($color: #cbced1, $alpha: 0.5),
-    -14rpx -14rpx 20rpx rgba($color: #ffffff, $alpha: 0.5);
+  box-shadow: 14rpx 14rpx 20rpx rgba($color: #cbced1, $alpha: 0.3),
+    -14rpx -14rpx 20rpx rgba($color: #ffffff, $alpha: 0.3);
   .logincontent {
     display: flex;
     flex-direction: column;
     align-items: center;
     .title {
-      color: #475164;
+      color: #fff;
       font-weight: bold;
       letter-spacing: 10rpx;
       padding: 15rpx 30rpx;
@@ -331,12 +331,12 @@ export default {
       //   -7rpx -7rpx 10rpx rgba($color: #ffffff, $alpha: 0.5);
     }
     .title1 {
-      color: #475164;
+      color: #fff;
       font-weight: bold;
       letter-spacing: 8rpx;
     }
     .title2 {
-      color: #475164;
+      color: #fff;
       font-weight: bold;
       letter-spacing: 8rpx;
       margin: 30rpx 0;
@@ -344,7 +344,7 @@ export default {
   }
 }
 .selectbox {
-  color: #475164;
+  color: #fff;
   width: 100%;
   max-height: 50vh;
   border-radius: 20rpx;
@@ -366,7 +366,7 @@ export default {
 }
 button {
   background-color: rgba($color: #ffffff, $alpha: 0);
-  color: #475164;
+  color: #fff;
   box-shadow: 7rpx 7rpx 10rpx rgba($color: #cbced1, $alpha: 0.5),
     -7rpx -7rpx 10rpx rgba($color: #ffffff, $alpha: 0.5);
 }
