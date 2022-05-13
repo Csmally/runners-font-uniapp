@@ -44,9 +44,7 @@ export default {
     };
   },
   methods: {
-    dianji() {
-      this.show = !this.show;
-    },
+    
   },
 };
 </script>

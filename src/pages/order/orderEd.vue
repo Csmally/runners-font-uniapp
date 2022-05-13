@@ -12,7 +12,7 @@
         <image class="goodsimg" v-if="item.photos" :src="item.photos" />
         <view class="priceinfo" style="margin:20rpx 0">
           <view>{{item.goodsAddress}}</view>
-          <view>商品价格11：{{item.goodsPrice.toFixed(2)}}</view>
+          <view>商品价格：{{item.goodsPrice.toFixed(2)}}</view>
           <view>报酬：{{item.price.toFixed(2)}}</view>
         </view>
       </view>
