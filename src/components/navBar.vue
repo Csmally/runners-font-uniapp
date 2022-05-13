@@ -54,7 +54,7 @@ export default {
       });
     },
     goToChatRoom() {
-      jumpTo("/pages/chatRoom/index",this.orderInfo);
+      jumpTo("/pages/chatRoom/index",{ orderInfo: this.orderInfo});
     }
   },
 };

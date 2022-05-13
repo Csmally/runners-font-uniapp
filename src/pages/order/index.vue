@@ -15,7 +15,7 @@
       <view>
         <NewOrder v-show="currentTab===0" :userInfo="userInfo" />
         <OrderIng v-show="currentTab===1" :userInfo="userInfo" :orderData="orderDataIng" />
-        <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderDataSelf" />
+        <OrderSelf v-show="currentTab===2" :userInfo="userInfo" :orderData="orderDataSelf" @getOrderData="getOrderData"/>
         <OrderEd v-show="currentTab===3" :userInfo="userInfo" :orderData="orderDataEd" />
       </view>
     </view>
@@ -55,9 +55,6 @@ export default {
       typeText: ["全部", "我发出的", "我接收的"],
       isChanging: false,
     };
-  },
-  onLoad() {
-    console.log('9898进来第二页')
   },
   onShow() {
     this.userInfo = uni.getStorageSync("userInfo");

@@ -6,7 +6,7 @@
         <view class="titleright">等待接单</view>
       </view>
       <view :class="item.photos?'middleinfo':''">
-        <image class="goodsimg" v-if="item.photos" :src="item.photos"/>
+        <image class="goodsimg" v-if="item.photos" :src="item.photos" />
         <view class="priceinfo" style="margin:20rpx 0">
           <view>{{item.goodsAddress}}</view>
           <view>商品价格：{{item.goodsPrice.toFixed(2)}}</view>
@@ -20,13 +20,14 @@
           <text>{{(item.goodsPrice+item.price).toFixed(2)}}</text>
         </view>
         <view class="date">{{item.createdAt}}</view>
-        <view class="cancelorder">取消订单</view>
+        <view class="cancelorder" @click="cancelOrder(item)">取消订单</view>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+import { uniRequest, jumpTo } from "@/utils/tool.js";
 export default {
   props: {
     orderData: {
@@ -44,7 +45,36 @@ export default {
     };
   },
   methods: {
-    
+    cancelOrder(item) {
+      uni.showActionSheet({
+        alertText: "确定取消此订单吗？",
+        itemList: ["确定"],
+        itemColor: "#ff0000",
+        success: () => this.changeOrderType(item),
+        fail: () => {},
+      });
+    },
+    async changeOrderType(item) {
+      let resData = await uniRequest("order/update", "POST", {
+        dbTable: this.userInfo.campus + "_orders",
+        searchParams: { id: item.id, status: 1 },
+        updateParams: { status: 4 },
+      });
+      if (resData.code === 1) {
+        uni.showToast({
+          title: "订单已取消",
+          icon: "none",
+          duration: 1500,
+        });
+      } else {
+        uni.showToast({
+          title: "订单已被接收，您需要在“订单-进行中”与runner沟通确认后取消",
+          icon: "none",
+          duration: 3500,
+        });
+      }
+      this.$emit("getOrderData");
+    },
   },
 };
 </script>

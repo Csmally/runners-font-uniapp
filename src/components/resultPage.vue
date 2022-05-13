@@ -120,7 +120,7 @@ export default {
       canvasWidth: null,
       canvasHeight: null,
       endCircular: 1.5,
-      time: 6,
+      time: 4,
     };
   },
   methods: {
