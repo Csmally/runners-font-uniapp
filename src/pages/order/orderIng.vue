@@ -69,13 +69,14 @@ export default {
   overflow: auto;
 }
 .chatitem {
-  padding: 25rpx;
+  padding: 20rpx;
   border-bottom: 1px solid #f8f8f8;
   display: flex;
+  align-items: center;
   .avatar {
-    width: 120rpx;
-    height: 120rpx;
-    border-radius: 12rpx;
+    width: 90rpx;
+    height: 90rpx;
+    border-radius: 10rpx;
   }
   .nameandinfo {
     flex-grow: 2;
@@ -84,13 +85,12 @@ export default {
     justify-content: space-between;
     margin-left: 25rpx;
     .nickname {
-      margin-top: 5rpx;
       font-size: 33rpx;
       font-weight: 500;
+      margin-bottom: 5rpx;
     }
     .chatinfo {
       color: #a09d9d;
-      margin-bottom: 5rpx;
       width: 350rpx;
       font-size: 30rpx;
     }
@@ -100,9 +100,9 @@ export default {
     flex-direction: column;
     justify-content: space-between;
     .goodsname {
-      margin-top: 5rpx;
       color: #a09d9d;
       margin-top: 10rpx;
+      margin-bottom: 5rpx;
     }
     .ordertype {
       width: 38rpx;

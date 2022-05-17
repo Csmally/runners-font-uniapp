@@ -1,12 +1,10 @@
 <template>
-  <view class="container" v-if="userInfo">
-    <NavBar mark="home" />
-    <view class="chattitle">
-      <view class="name" :style="{paddingTop:statusBarHeight}">
-        {{userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'runnerInfo'].nickName:orderInfo[userInfo.campus+'publisherInfo'].nickName}}
-      </view>
+  <NavBar mark="home" />
+  <view class="container" :style="{height: containerHeight+'px'}" v-if="userInfo" @click="changeToolsBarShow(false)">
+    <view class="header" :style="{paddingTop:statusBarHeight}">
+      {{userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'runnerInfo'].nickName:orderInfo[userInfo.campus+'publisherInfo'].nickName}}
     </view>
-    <scroll-view scroll-y :scroll-into-view="showid" :style="'height: '+scrollHeight" class="chatbox" scroll-anchoring :scroll-with-animation="true">
+    <scroll-view scroll-y :scroll-into-view="showid" class="chatbox" scroll-anchoring :scroll-with-animation="true">
       <view class="chatInfo" v-for="(item,index) in allChatLog" :id="'showid'+index" :key="index">
         <view class="chatright" v-if="item.fromOpenid===userInfo.openid">
           <image class="avatarimage" :src="userInfo.openid===orderInfo.publisherOpenid?orderInfo[userInfo.campus+'publisherInfo'].avatarUrl:orderInfo[userInfo.campus+'runnerInfo'].avatarUrl" />
@@ -42,14 +40,15 @@
         </view>
       </view>
     </scroll-view>
-    <view class="operationbar">
+    <view class="operationbar" @click.stop>
       <view class="operationbox">
         <view class="inputbox">
-          <!-- <textarea style="width:100%" auto-height :show-confirm-bar="false" :cursor-spacing="15" v-model="inputValue" confirm-type="send" @confirm="senMsg" /> -->
-          <!-- <input style="width:100%" :adjust-position="false" v-model="inputValue" confirm-type="send" confirm-hold @confirm="senMsg" @blur="blurInput" @focus="focusInput" /> -->
           <input style="width:100%" :adjust-position="false" v-model="inputValue" confirm-type="send" confirm-hold @confirm="senMsg" @keyboardheightchange="keyboardheightchange" />
         </view>
-        <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="chooseMedia"></tui-icon>
+        <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="changeToolsBarShow(true)"></tui-icon>
+      </view>
+      <view v-show="isShowToolsBar">
+        <OperationTools />
       </view>
     </view>
     <video class="covervideo" id="videoplayer" autoplay :direction="0" v-show="isFullScreen" :src="videoPath" @fullscreenchange="fullscreenchange" />
@@ -58,17 +57,17 @@
 
 <script>
 import NavBar from "@/components/navBar.vue";
-import navigationBar from "@/components/navigationBar.vue";
 import { chatSendFiles } from "@/utils/tool.js";
+import OperationTools from "./operationTools.vue";
 export default {
-  components: { navigationBar, NavBar },
+  components: { NavBar, OperationTools },
   onLoad(option) {
-    let scrollHeight =
-      (uni.getStorageSync("systemInfo").screenHeight / 100) * 78;
-    this.scrollHeight = scrollHeight + "px";
-    this.initHeight = scrollHeight;
-    this.orderInfo = JSON.parse(option.orderInfo);
+    let systemInfo = uni.getStorageSync("systemInfo");
+    this.systemInfo = systemInfo;
+    this.initContainerHeight = systemInfo.windowHeight;
+    this.containerHeight = systemInfo.windowHeight;
     this.userInfo = uni.getStorageSync("userInfo");
+    this.orderInfo = JSON.parse(option.orderInfo);
     let socketObj = getApp().globalData.socketObj;
     this.socketObj = socketObj;
     let orderid = this.orderInfo.orderid;
@@ -89,61 +88,25 @@ export default {
   },
   data() {
     return {
-      isFullScreen: false,
-      videoPath: null,
       userInfo: null,
       orderInfo: null,
-      socketObj: null,
-      inputValue: "",
-      allChatLog: [],
       statusBarHeight: uni.getStorageSync("menuInfo").statusBarHeight,
       showid: null,
-      systemInfo: uni.getStorageSync("systemInfo"),
+      allChatLog: [],
       loadingMap: new Map(),
-      scrollHeight: null,
-      initHeight: null,
+      systemInfo: null,
+      isFullScreen: false,
+      videoPath: null,
+      inputValue: null,
+      socketObj: null,
+      isShowToolsBar: false,
+      initContainerHeight: null,
+      containerHeight: null,
     };
   },
   methods: {
     changeScrollShow() {
       this.showid = "showid" + (this.allChatLog.length - 1);
-    },
-    senMsg() {
-      let toopenid =
-        this.userInfo.openid === this.orderInfo.publisherOpenid
-          ? this.orderInfo.runnerOpenid
-          : this.orderInfo.publisherOpenid;
-      let orderid = this.orderInfo.orderid;
-      this.socketObj.emit("sendMessage", {
-        toopenid,
-        dbTable: this.userInfo.campus + "_chatlogs",
-        msgData: {
-          text: this.inputValue,
-          orderid,
-          msgType: "text",
-          fromOpenid: this.userInfo.openid,
-        },
-      });
-      this.allChatLog.push({
-        text: this.inputValue,
-        orderid,
-        msgType: "text",
-        fromOpenid: this.userInfo.openid,
-      });
-      this.changeScrollShow();
-      this.inputValue = "";
-    },
-    chooseMedia() {
-      uni.chooseMedia({
-        count: 1,
-        success: async (res) => {
-          let orderid = this.orderInfo.orderid;
-          chatSendFiles(res, this, orderid, this.userInfo.campus + "_chatlogs");
-        },
-      });
-    },
-    previewImage(src) {
-      uni.previewImage({ urls: [src], indicator: "none" });
     },
     getVideoStyle(style) {
       if (style) {
@@ -187,34 +150,162 @@ export default {
         this.isFullScreen = false;
       }
     },
-    blurInput() {
-      this.scrollHeight = this.initHeight + "px";
-    },
-    focusInput(e) {
-      this.scrollHeight = (this.initHeight / 78) * 82 - e.detail.height + "px";
+    senMsg() {
+      let toopenid =
+        this.userInfo.openid === this.orderInfo.publisherOpenid
+          ? this.orderInfo.runnerOpenid
+          : this.orderInfo.publisherOpenid;
+      let orderid = this.orderInfo.orderid;
+      this.socketObj.emit("sendMessage", {
+        toopenid,
+        dbTable: this.userInfo.campus + "_chatlogs",
+        msgData: {
+          text: this.inputValue,
+          orderid,
+          msgType: "text",
+          fromOpenid: this.userInfo.openid,
+        },
+      });
+      this.allChatLog.push({
+        text: this.inputValue,
+        orderid,
+        msgType: "text",
+        fromOpenid: this.userInfo.openid,
+      });
       this.changeScrollShow();
+      this.inputValue = null;
     },
     keyboardheightchange(e) {
+      this.isShowToolsBar = false;
       if (e.detail.height === 0) {
-        this.scrollHeight = this.initHeight + "px";
+        this.containerHeight = this.initContainerHeight;
       } else {
-        this.scrollHeight =
-          (this.initHeight / 78) * 82 - e.detail.height + "px";
+        this.containerHeight = this.initContainerHeight - e.detail.height + 30;
       }
+    },
+    changeToolsBarShow(flag) {
+      this.isShowToolsBar = flag;
+    },
+    chooseMedia() {
+      uni.chooseMedia({
+        count: 1,
+        success: async (res) => {
+          let orderid = this.orderInfo.orderid;
+          chatSendFiles(res, this, orderid, this.userInfo.campus + "_chatlogs");
+        },
+      });
     },
   },
 };
 </script>
 
 <style lang="scss">
-page {
-  background-color: #ededed;
+.container {
+  // height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-.mainbox {
-  transition: bottom 0.15s ease;
+.header {
+  height: 11vh;
+  background-color: #f6f6f6;
+  border-bottom: 1px solid #e7e6e6;
+  flex-grow: 0;
+  font-size: 33rpx;
+  color: #000;
+  font-weight: 500;
+  text-align: center;
+  height: 44px;
+  line-height: 44px;
 }
-.covervideo {
-  position: absolute;
+.chatbox {
+  flex-grow: 1;
+  background-color: #f6f6f6;
+  box-sizing: border-box;
+  overflow: auto;
+  .chatInfo {
+    padding: 20rpx 25rpx;
+    .chatright {
+      display: flex;
+      flex-direction: row-reverse;
+      .avatarimage {
+        width: 90rpx;
+        height: 90rpx;
+        border-radius: 10rpx;
+      }
+      .textright {
+        position: relative;
+        .speakright {
+          position: absolute;
+          right: 1px;
+          top: 30rpx;
+          border-top: 15rpx solid #f6f6f6;
+          border-bottom: 15rpx solid #f6f6f6;
+          border-left: 15rpx solid #64d777;
+          border-right: 15rpx solid #f6f6f6;
+        }
+        .chatcontent {
+          min-height: 40rpx;
+          display: flex;
+          align-items: center;
+          padding: 25rpx;
+          margin-right: 30rpx;
+          border-radius: 15rpx;
+          background-color: #64d777;
+          view {
+            max-width: 410rpx;
+          }
+        }
+      }
+      .chatImage {
+        max-width: 250rpx;
+        border-radius: 15rpx;
+        margin-right: 30rpx;
+      }
+    }
+    .chatleft {
+      display: flex;
+      .avatarimage {
+        width: 90rpx;
+        height: 90rpx;
+        border-radius: 10rpx;
+      }
+      .textleft {
+        position: relative;
+        .speakleft {
+          position: absolute;
+          left: 1px;
+          top: 30rpx;
+          border-top: 15rpx solid #f6f6f6;
+          border-bottom: 15rpx solid #f6f6f6;
+          border-left: 15rpx solid #f6f6f6;
+          border-right: 15rpx solid #ffffff;
+        }
+        .chatcontent {
+          min-height: 40rpx;
+          display: flex;
+          align-items: center;
+          padding: 25rpx;
+          margin-left: 30rpx;
+          border-radius: 15rpx;
+          background-color: #ffffff;
+          view {
+            max-width: 410rpx;
+          }
+        }
+      }
+      .chatImage {
+        max-width: 250rpx;
+        border-radius: 15rpx;
+        margin-left: 30rpx;
+      }
+      .chatVideo {
+        margin-left: 30rpx;
+        max-height: 350rpx;
+        max-width: 400rpx;
+        border-radius: 15rpx;
+      }
+    }
+  }
 }
 .videobox {
   position: relative;
@@ -250,139 +341,16 @@ page {
     height: 60rpx;
   }
 }
-.container {
-  // position: relative;
-  height: 100vh;
-}
-.chattitle {
-  height: 11vh;
-  width: 100%;
-  z-index: 2;
-  background-color: #ffffff;
-  .name {
-    font-size: 33rpx;
-    color: #000;
-    font-weight: 500;
-    text-align: center;
-    height: 44px;
-    line-height: 44px;
-  }
-}
-@-webkit-keyframes videoloading {
-  0% {
-    -webkit-transform: rotate(0);
-    -moz-transform: rotate(0);
-    -ms-transform: rotate(0);
-    -o-transform: rotate(0);
-    transform: rotate(0);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-    -moz-transform: rotate(360deg);
-    -ms-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-.chatbox {
-  background-color: #ededed;
-  width: 100%;
-  box-sizing: border-box;
-  transition: height 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  .chatInfo {
-    padding: 20rpx 25rpx;
-    .chatright {
-      display: flex;
-      flex-direction: row-reverse;
-      .avatarimage {
-        width: 90rpx;
-        height: 90rpx;
-        border-radius: 10rpx;
-      }
-      .textright {
-        position: relative;
-        .speakright {
-          position: absolute;
-          right: 1px;
-          top: 30rpx;
-          border-top: 15rpx solid #ededed;
-          border-bottom: 15rpx solid #ededed;
-          border-left: 15rpx solid #64d777;
-          border-right: 15rpx solid #ededed;
-        }
-        .chatcontent {
-          min-height: 40rpx;
-          display: flex;
-          align-items: center;
-          padding: 25rpx;
-          margin-right: 30rpx;
-          border-radius: 15rpx;
-          background-color: #64d777;
-          view {
-            max-width: 410rpx;
-          }
-        }
-      }
-      .chatImage {
-        max-width: 250rpx;
-        border-radius: 15rpx;
-        margin-right: 30rpx;
-      }
-    }
-    .chatleft {
-      display: flex;
-      .avatarimage {
-        width: 90rpx;
-        height: 90rpx;
-        border-radius: 10rpx;
-      }
-      .textleft {
-        position: relative;
-        .speakleft {
-          position: absolute;
-          left: 1px;
-          top: 30rpx;
-          border-top: 15rpx solid #ededed;
-          border-bottom: 15rpx solid #ededed;
-          border-left: 15rpx solid #ededed;
-          border-right: 15rpx solid #ffffff;
-        }
-        .chatcontent {
-          min-height: 40rpx;
-          display: flex;
-          align-items: center;
-          padding: 25rpx;
-          margin-left: 30rpx;
-          border-radius: 15rpx;
-          background-color: #ffffff;
-          view {
-            max-width: 410rpx;
-          }
-        }
-      }
-      .chatImage {
-        max-width: 250rpx;
-        border-radius: 15rpx;
-        margin-left: 30rpx;
-      }
-      .chatVideo {
-        margin-left: 30rpx;
-        max-height: 350rpx;
-        max-width: 400rpx;
-        border-radius: 15rpx;
-      }
-    }
-  }
-}
 .operationbar {
+  flex-grow: 0;
   background-color: #f6f6f6;
   border-top: 1px solid #e7e6e6;
-  height: 11vh;
-  width: 100%;
+  transition: padding 0.15s ease;
+  padding-bottom: 5vh;
   .operationbox {
+    margin-top: 20rpx;
     padding: 0 20rpx;
     display: flex;
-    height: 7vh;
     justify-content: space-between;
     align-items: center;
     .inputbox {
@@ -395,5 +363,8 @@ page {
       align-items: center;
     }
   }
+}
+.covervideo {
+  position: absolute;
 }
 </style>
