@@ -54,11 +54,11 @@
         <view class="infoitem" v-if="orderInfo.desc||orderInfo.photos">
           <view class="itemtitle">附加信息</view>
           <view>
-            <view class="itemcontentdesc" v-if="orderInfo.desc&&orderInfo.openid===userInfo.openid">
+            <view class="itemcontentdesc" v-if="isShowInfo===true||(orderInfo.desc&&orderInfo.openid===userInfo.openid)">
               <view>备注：</view>
               <view class="desctext">{{orderInfo.desc}}</view>
             </view>
-            <view class="itemcontent" v-if="orderInfo.desc&&orderInfo.openid!==userInfo.openid">
+            <view class="itemcontent" v-if="isShowInfo===false&&orderInfo.desc&&orderInfo.publisherOpenid!==userInfo.openid">
               <view>备注：</view>
               <view>* * * * * *</view>
             </view>
@@ -72,23 +72,23 @@
           <view>
             <view class="itemcontent" v-if="orderInfo.mobile">
               <view>手机号码</view>
-              <view v-if="orderInfo.openid!==userInfo.openid">* * * * * *</view>
-              <view v-if="orderInfo.openid===userInfo.openid">{{orderInfo.mobile}}</view>
+              <view v-if="isShowInfo===false&&orderInfo.publisherOpenid!==userInfo.openid">* * * * * *</view>
+              <view v-if="isShowInfo===true||orderInfo.publisherOpenid===userInfo.openid">{{orderInfo.mobile}}</view>
             </view>
             <view class="itemcontent" v-if="orderInfo.wxAccount">
               <view>微信号码</view>
-              <view v-if="orderInfo.openid!==userInfo.openid">* * * * * *</view>
-              <view v-if="orderInfo.openid===userInfo.openid">{{orderInfo.wxAccount}}</view>
+              <view v-if="isShowInfo===false&&orderInfo.publisherOpenid!==userInfo.openid">* * * * * *</view>
+              <view v-if="isShowInfo===true||orderInfo.publisherOpenid===userInfo.openid">{{orderInfo.wxAccount}}</view>
             </view>
             <view class="itemcontent" v-if="orderInfo.qqAccount">
               <view>QQ号码</view>
-              <view v-if="orderInfo.openid!==userInfo.openid">* * * * * *</view>
-              <view v-if="orderInfo.openid===userInfo.openid">{{orderInfo.qqAccount}}</view>
+              <view v-if="isShowInfo===false&&orderInfo.publisherOpenid!==userInfo.openid">* * * * * *</view>
+              <view v-if="isShowInfo===true||orderInfo.publisherOpenid===userInfo.openid">{{orderInfo.qqAccount}}</view>
             </view>
           </view>
         </view>
       </view>
-      <fui-button v-if="orderInfo.publisherOpenid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
+      <fui-button v-if="isShowInfo===false&&orderInfo.publisherOpenid!==userInfo.openid" class="submitBtn" width="80%" background="#000000" color="#FFFFFF" @click="startOrder">开始</fui-button>
     </view>
   </view>
 </template>
@@ -100,6 +100,8 @@ export default {
   onLoad(option) {
     this.userInfo = uni.getStorageSync("userInfo");
     let orderInfo = JSON.parse(option.orderInfo);
+    let isShowInfo = option.isShowInfo;
+    this.isShowInfo = isShowInfo === "true" ? true : false;
     let socketObj = getApp().globalData.socketObj;
     socketObj.on("orderChange", (data) => {
       console.log("9898socketzhi", data);
@@ -121,6 +123,7 @@ export default {
       userInfo: null,
       allHeight: null,
       socketObj: null,
+      isShowInfo: false,
     };
   },
   methods: {

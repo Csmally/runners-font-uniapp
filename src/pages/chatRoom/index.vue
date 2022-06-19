@@ -48,7 +48,7 @@
         <tui-icon name="add" color="#000000" size="65" unit="rpx" @click="changeToolsBarShow(true)"></tui-icon>
       </view>
       <view v-show="isShowToolsBar">
-        <OperationTools />
+        <OperationTools :userInfo="userInfo" :orderInfo="orderInfo" @chooseMedia="chooseMedia" @showOrderInfo="showOrderInfo" @addMoneyReq="addMoneyReq" />
       </view>
     </view>
     <video class="covervideo" id="videoplayer" autoplay :direction="0" v-show="isFullScreen" :src="videoPath" @fullscreenchange="fullscreenchange" />
@@ -57,7 +57,7 @@
 
 <script>
 import NavBar from "@/components/navBar.vue";
-import { chatSendFiles } from "@/utils/tool.js";
+import { chatSendFiles, jumpTo } from "@/utils/tool.js";
 import OperationTools from "./operationTools.vue";
 export default {
   components: { NavBar, OperationTools },
@@ -133,6 +133,9 @@ export default {
         }
       }
     },
+    previewImage(src) {
+      uni.previewImage({ urls: [src], indicator: "none" });
+    },
     lookVideo(item) {
       this.isFullScreen = true;
       this.videoPath = item.videoCdnPath;
@@ -195,15 +198,24 @@ export default {
         },
       });
     },
+    showOrderInfo() {
+      jumpTo("/pages/list/moreInfo", {
+        orderInfo: JSON.stringify(this.orderInfo),
+        isShowInfo: true,
+      });
+    },
+    addMoneyReq() {
+      this.isShowToolsBar = false;
+    },
   },
 };
 </script>
 
 <style lang="scss">
 .container {
-  // height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: height 0.15s ease;
 }
 .header {
   height: 11vh;
@@ -341,11 +353,18 @@ export default {
     height: 60rpx;
   }
 }
+@keyframes videoloading {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .operationbar {
   flex-grow: 0;
   background-color: #f6f6f6;
   border-top: 1px solid #e7e6e6;
-  transition: padding 0.15s ease;
   padding-bottom: 5vh;
   .operationbox {
     margin-top: 20rpx;
